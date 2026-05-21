@@ -11,7 +11,7 @@ export function createInitialState(now = 0) {
     creditsSeen: false,
     levelsCleared: 0,
     boss: createBossState(),
-    message: "Press Enter to begin the relay"
+    message: "Tryck Enter för att starta reläet"
   };
 }
 
@@ -33,7 +33,7 @@ export function startGame(state = createInitialState(), now = 0) {
     creditsSeen: false,
     levelsCleared: 0,
     boss: createBossState(),
-    message: "Ember Gate tower lit"
+    message: "Glödportens torn är tänt"
   };
 }
 
@@ -42,8 +42,8 @@ export function returnToMenu(state = createInitialState()) {
     ...createInitialState(),
     creditsSeen: state.screen === "ending" || state.creditsSeen,
     message: state.screen === "ending"
-      ? "Sky Relay lit. Press Enter for a new run"
-      : "Press Enter to begin the relay"
+      ? "Himmelreläet är tänt. Tryck Enter för en ny runda"
+      : "Tryck Enter för att starta reläet"
   };
 }
 
@@ -67,8 +67,8 @@ export function clearCurrentLevel(state) {
     levelsCleared: Math.max(state.level, state.levelsCleared),
     boss: nextLevel === BOSS_LEVEL ? createBossState() : state.boss,
     message: nextLevel === BOSS_LEVEL
-      ? "Final tower waits. Shatter the prism core"
-      : `Tower ${nextLevel} is lit`
+      ? "Sista tornet väntar. Krossa prismakärnan"
+      : `Torn ${nextLevel} är tänt`
   };
 }
 
@@ -87,7 +87,7 @@ export function damageBoss(state, amount = 1, now = 0) {
         ...state.boss,
         health: nextHealth
       },
-      message: "Prism core cracking"
+      message: "Prismakärnan spricker"
     };
   }
 
@@ -102,7 +102,7 @@ export function damageBoss(state, amount = 1, now = 0) {
       health: 0,
       defeated: true
     },
-    message: "Sky Relay lit"
+    message: "Himmelreläet är tänt"
   };
 }
 

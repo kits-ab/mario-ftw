@@ -30,9 +30,9 @@ const state = {
   levelIndex: 0,
   score: 0,
   cameraX: 0,
-  messageTitle: "Cinder Run: Sky Relay",
-  messageBody: "Dash the ember road, gather prism sparks, and relight three towers before the sky grid fades.",
-  messageButton: "Begin Relay",
+  messageTitle: "Glödloppet: Himmelreläet",
+  messageBody: "Rusa längs glödvägen, samla prismagnistor och tänd tre torn innan himmelnätet bleknar.",
+  messageButton: "Starta reläet",
   lastTime: 0
 };
 
@@ -109,7 +109,7 @@ const music = (() => {
   let nextStepTime = 0;
 
   function updateButton() {
-    ui.musicButton.textContent = muted ? "Restore" : "Silence";
+    ui.musicButton.textContent = muted ? "Spela" : "Tysta";
     ui.musicButton.setAttribute("aria-pressed", String(muted));
   }
 
@@ -131,7 +131,7 @@ const music = (() => {
 
   function ensureContext() {
     if (!AudioContextCtor) {
-      ui.musicButton.textContent = "No Tune";
+      ui.musicButton.textContent = "Ingen melodi";
       ui.musicButton.disabled = true;
       return null;
     }
@@ -279,7 +279,7 @@ const player = {
 
 const levels = [
   {
-    name: "1-1 Ember Gate",
+    name: "1-1 Glödporten",
     width: 1500,
     sky: ["#69ddff", "#ffe177"],
     ground: ["#5b351f", "#e27b38", "#ffd75a"],
@@ -316,7 +316,7 @@ const levels = [
     ]
   },
   {
-    name: "2-2 Moon Mill",
+    name: "2-2 Månkvarnen",
     width: 1700,
     sky: ["#3c58d6", "#c27cff"],
     ground: ["#2f315c", "#6d65cc", "#7ce6ff"],
@@ -356,7 +356,7 @@ const levels = [
     ]
   },
   {
-    name: "3-3 Prism Spire",
+    name: "3-3 Prismaspiran",
     width: 1900,
     sky: ["#7744c8", "#ff7aa8"],
     ground: ["#3b285a", "#c15a95", "#74ffd8"],
@@ -392,7 +392,7 @@ const levels = [
       { x: 1618, y: 122 }
     ],
     boss: {
-      name: "Glassheart Warden",
+      name: "Glashjärtats Väktare",
       x: 1732,
       y: 144,
       w: 30,
@@ -469,9 +469,9 @@ function showTitle() {
   resetPlayer(level.spawn);
   updateHud();
   showMessage(
-    "Cinder Run: Sky Relay",
-    "Dash the ember road, gather prism sparks, and relight three towers before the sky grid fades.",
-    "Begin Relay"
+    "Glödloppet: Himmelreläet",
+    "Rusa längs glödvägen, samla prismagnistor och tänd tre torn innan himmelnätet bleknar.",
+    "Starta reläet"
   );
 }
 
@@ -480,14 +480,14 @@ function completeRun() {
   state.cameraX = 0;
   ui.bossHud.hidden = true;
   showMessage(
-    "Sky Relay Lit",
-    `All three towers burn bright. Final score: ${state.score} prism sparks. Credits: design, code, audio, and pixel craft by the relay crew.`,
-    "New Run"
+    "Himmelreläet tänt",
+    `Alla tre torn lyser klart. Slutpoäng: ${state.score} prismagnistor. Medverkan: form, kod, ljud och pixelkonst av relägruppen.`,
+    "Ny runda"
   );
 }
 
 function updateHud() {
-  ui.levelName.textContent = level ? level.name : "1-1 Ember Gate";
+  ui.levelName.textContent = level ? level.name : "1-1 Glödporten";
   ui.score.textContent = String(state.score);
   ui.hearts.textContent = "♥".repeat(Math.max(0, player.hp)) || "0";
   if (boss && boss.alive) {
@@ -536,7 +536,7 @@ function damagePlayer(amount = 1) {
   updateHud();
   if (player.hp <= 0) {
     state.mode = "lost";
-    showMessage("Spark Out", "The route went dark. Retry the stage and keep the relay burning.", "Retry Stage");
+    showMessage("Gnistan slocknade", "Vägen mörknade. Försök banan igen och håll reläet tänt.", "Försök igen");
   }
 }
 
@@ -712,7 +712,7 @@ function updateGoal() {
   const goal = { x: level.goal.x, y: level.goal.y, w: 18, h: 86 };
   if (!rectsTouch(player, goal)) return;
   if (boss && boss.alive) {
-    showToast("Shatter the warden core first.");
+    showToast("Krossa väktarkärnan först.");
     return;
   }
   if (state.levelIndex < levels.length - 1) {
@@ -988,10 +988,10 @@ function drawEnding() {
   ctx.textAlign = "center";
   ctx.fillStyle = "#7cff9b";
   ctx.font = "22px monospace";
-  ctx.fillText("SKY RELAY LIT", VIEW_W / 2, 45);
+  ctx.fillText("HIMMELRELÄET TÄNT", VIEW_W / 2, 45);
   ctx.fillStyle = "#f8f3d2";
   ctx.font = "9px monospace";
-  ctx.fillText("three towers burn over the cinder road", VIEW_W / 2, 64);
+  ctx.fillText("tre torn lyser över glödvägen", VIEW_W / 2, 64);
 
   const colors = ["#ffcf5a", "#4fe0a7", "#ff9ccc"];
   for (let i = 0; i < 3; i += 1) {
@@ -1009,11 +1009,11 @@ function drawEnding() {
 
   ctx.fillStyle = "#f2b84b";
   ctx.font = "8px monospace";
-  ctx.fillText("CREDITS", VIEW_W / 2, 87);
+  ctx.fillText("MEDVERKAN", VIEW_W / 2, 87);
   ctx.fillStyle = "#d8ddff";
-  ctx.fillText("design  code  audio  pixel craft", VIEW_W / 2, 100);
-  ctx.fillText("the original sky relay crew", VIEW_W / 2, 112);
-  ctx.fillText("ENTER/R: new run     ESC: title", VIEW_W / 2, 156);
+  ctx.fillText("form  kod  ljud  pixelkonst", VIEW_W / 2, 100);
+  ctx.fillText("den ursprungliga himmelrelägruppen", VIEW_W / 2, 112);
+  ctx.fillText("ENTER/R: ny runda     ESC: titel", VIEW_W / 2, 156);
   ctx.textAlign = "left";
 }
 

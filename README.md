@@ -1,54 +1,52 @@
-# Cinder Run: Sky Relay
+# Glödloppet: Himmelreläet
 
-An original browser-based retro platformer prototype about relighting a fading sky relay. It uses generated canvas pixel art and original names, code, maps, enemies, soundtrack, and boss design.
+Ett fristående webbläsarbaserat retroplattformsspel om att tända ett bleknande himmelrelä. Spelet använder genererad pixelgrafik i canvas och egna namn, egen kod, egna banor, fiender, melodier och bossupplägg.
 
-## Run Locally
+## Kör lokalt
 
-Open `index.html` directly in a browser, or serve the folder with any static server:
+Öppna `index.html` direkt i en webbläsare eller servera mappen med valfri statisk server:
 
 ```sh
 npm start
 ```
 
-Then visit `http://127.0.0.1:8765`.
+Gå sedan till `http://127.0.0.1:8765`.
 
-## Controls
+## Kontroller
 
-- Run: `A` / `D` or left / right arrows
-- Leap: `W`, up arrow, or space
-- Run into a leap to gain a little extra height from your horizontal speed
-- Silence/restore the original tune: `M` or the Tune button
-- Retry current stage: `R`
-- Begin from title or ending screen: `Enter`
-- Return to the title menu: `Esc`
+- Spring: `A` / `D` eller vänster / höger pil
+- Hoppa: `W`, uppåtpil eller mellanslag
+- Spring in i ett hopp för att få lite extra höjd av farten
+- Tysta eller spela den egna melodin: `M` eller knappen Melodi
+- Försök igen på aktuell bana: `R`
+- Starta från titel- eller slutskärmen: `Enter`
+- Återgå till titelmenyn: `Esc`
 
-## Audio
+## Ljud
 
-The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, triangle harmony stabs, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Begin Relay, `Enter`, `R`, or the Tune button.
+Musiken är en egen chiptune-liknande slinga som skapas i `src/game.js` med Web Audio API. Den använder syntetiserade fyrkantsvågsstämmor, pulsbass, arpeggion, triangelharmonier och brusbaserad rytm. Inga kopierade melodier, samplingar eller externa ljudfiler används. Webbläsarljud startar först efter spelarens inmatning, till exempel Starta reläet, `Enter`, `R` eller knappen Melodi.
 
-## Visual Style
+## Visuell Stil
 
-All stage art is drawn at runtime with original canvas pixel shapes. The brighter tile palettes, chunky character silhouettes, crystals, relay flags, enemies, boss, background hills, cloud clusters, and skyline details are purpose-built for this project and do not use franchise sprites, logos, copied block designs, or copied maps.
+All bangrafik ritas vid körning med egna pixelformer i canvas. De ljusa paletterna, kraftiga figursilhuetterna, kristallerna, reläflaggorna, fienderna, bossen, bakgrundskullarna, molnklustren och horisontdetaljerna är gjorda för detta projekt och använder inga franchisekopplade sprites, logotyper, kopierade blockdesigner eller kopierade banor.
 
-## Game Structure
+## Spelstruktur
 
-- `1-1 Ember Gate`: introductory gaps, patrol enemies, and prism spark pickups
-- `2-2 Moon Mill`: tighter leaps with staggered platforms
-- `3-3 Prism Spire`: final approach ending in the Glassheart Warden boss fight
+- `1-1 Glödporten`: introducerande gap, patrullerande fiender och prismagnistor att samla
+- `2-2 Månkvarnen`: tajtare hopp med förskjutna plattformar
+- `3-3 Prismaspiran`: sista vägen fram till bossen Glashjärtats Väktare
 
-Reach the relay flag at the end of each stage. On stage 3, defeat the Glassheart Warden to trigger the ending screen immediately.
+Nå reläflaggan i slutet av varje bana. På bana 3 besegrar du Glashjärtats Väktare för att direkt visa slutskärmen.
 
-## Ending Flow
+## Slutflöde
 
-Defeating the stage 3 boss opens a dedicated pixel-art ending screen with completion text and credits. From that ending, press `Enter` or `R` to start a new run, or press `Esc` to return to the title menu.
+När bossen på bana 3 besegras öppnas en egen pixelritad slutskärm med avslutande text och medverkan. Därifrån kan du trycka `Enter` eller `R` för att starta en ny runda, eller `Esc` för att gå tillbaka till titelmenyn.
 
-## Original Arcade Sound Effects
+## Egna Arkadljudeffekter
 
-The repository also includes an original Web Audio sound-effects module for
-retro platformer gameplay. The effects are synthesized at runtime and do not use
-franchise samples or ripped audio assets.
+Koden innehåller också en egen Web Audio-modul för retroljudeffekter i plattformsspel. Effekterna syntetiseras vid körning och använder inga franchiseljud eller rippade ljudfiler.
 
-### Included Effects
+### Ingående Effekter
 
 - `jump`
 - `collect`
@@ -59,7 +57,7 @@ franchise samples or ripped audio assets.
 - `gameOver`
 - `menuConfirm`
 
-### Usage
+### Användning
 
 ```js
 import { RetroSfx } from "./src/retro-sfx.js";
@@ -80,13 +78,11 @@ level.onClear = () => sfx.play("levelClear");
 game.onGameOver = () => sfx.play("gameOver");
 ```
 
-`RetroSfx` also accepts `play("confirm")` as an alias for `menuConfirm`.
+`RetroSfx` accepterar även `play("confirm")` som alias för `menuConfirm`.
 
-### Sound Controls
+### Ljudkontroller
 
-Browsers require a user gesture before audio can start. `RetroSfx` installs
-one-shot pointer, keyboard, and touch unlock listeners by default. You can also
-call `await sfx.unlock()` from a start/menu button.
+Webbläsare kräver en användargest innan ljud kan starta. `RetroSfx` lägger som standard till engångslyssnare för pekare, tangentbord och beröring som låser upp ljudet. Du kan också anropa `await sfx.unlock()` från en start- eller menyknapp.
 
 ```js
 sfx.setMuted(true);
@@ -95,10 +91,8 @@ sfx.toggleMute();
 sfx.setVolume(0.4);
 ```
 
-Calling `play()` while muted returns `false`. Calling `play()` before the browser
-has unlocked audio also returns `false` and attempts to resume the audio context.
+Ett anrop till `play()` när ljudet är tystat returnerar `false`. Ett anrop till `play()` innan webbläsaren har låst upp ljudet returnerar också `false` och försöker återuppta ljudkontexten.
 
 ### Demo
 
-Open `demo/index.html` in a browser and press `Enable sound`, then trigger each
-effect button. The demo uses the same mute and volume API intended for gameplay.
+Öppna `demo/index.html` i en webbläsare och tryck på `Aktivera ljud`. Testa sedan effektknapparna. Demot använder samma API för tystning och volym som spelet.

@@ -62,5 +62,5 @@ test("restart and menu commands leave the ending flow cleanly", () => {
 
   const menu = handleCommand(state, "menu", 600);
   assert.equal(menu.screen, "menu");
-  assert.match(menu.message, /Sky Relay lit/);
+  assert.match(menu.message, /Himmelreläet är tänt/);
 });

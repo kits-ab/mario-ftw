@@ -39,7 +39,7 @@ test("supports confirm alias and rejects unknown effects", () => {
   const sfx = new RetroSfx({ context: new FakeAudioContext(), autoUnlock: false });
 
   assert.equal(sfx.play("confirm"), true);
-  assert.throws(() => sfx.play("missing"), /Unknown sound effect/);
+  assert.throws(() => sfx.play("missing"), /Okänd ljudeffekt/);
 });
 
 class FakeAudioContext {

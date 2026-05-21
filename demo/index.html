@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="sv">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Retro SFX Demo</title>
+    <title>Retroljuddemo</title>
     <style>
       :root {
         color-scheme: dark;
@@ -64,12 +64,12 @@
   </head>
   <body>
     <main>
-      <h1>Retro SFX Demo</h1>
+      <h1>Retroljuddemo</h1>
       <div class="controls">
-        <button id="unlock" type="button">Enable sound</button>
-        <button id="mute" type="button">Mute</button>
+        <button id="unlock" type="button">Aktivera ljud</button>
+        <button id="mute" type="button">Tysta</button>
         <label>
-          Volume
+          Volym
           <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7">
         </label>
       </div>
@@ -82,6 +82,16 @@
       const effects = document.querySelector("#effects");
       const mute = document.querySelector("#mute");
       const volume = document.querySelector("#volume");
+      const labels = {
+        jump: "Hopp",
+        collect: "Samla",
+        damage: "Skada",
+        enemyHit: "Fiendeträff",
+        bossHit: "Bossträff",
+        levelClear: "Bana klar",
+        gameOver: "Spelet slut",
+        menuConfirm: "Menyval"
+      };
 
       document.querySelector("#unlock").addEventListener("click", async () => {
         await sfx.unlock();
@@ -90,7 +100,7 @@
 
       mute.addEventListener("click", () => {
         const muted = sfx.toggleMute();
-        mute.textContent = muted ? "Unmute" : "Mute";
+        mute.textContent = muted ? "Spela" : "Tysta";
       });
 
       volume.addEventListener("input", () => {
@@ -100,7 +110,7 @@
       for (const effect of RetroSfx.effects) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = effect;
+        button.textContent = labels[effect] || "Okänd effekt";
         button.addEventListener("click", () => sfx.play(effect));
         effects.append(button);
       }

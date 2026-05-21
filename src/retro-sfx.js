@@ -160,7 +160,7 @@ export class RetroSfx {
         this.playMenuConfirm(now, gain, pitch);
         return true;
       default:
-        throw new RangeError(`Unknown sound effect: ${effectName}`);
+        throw new RangeError(`Okänd ljudeffekt: ${effectName}`);
     }
   }
 

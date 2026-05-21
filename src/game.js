@@ -281,9 +281,20 @@ const levels = [
   {
     name: "1-1 Glödporten",
     width: 1500,
-    sky: ["#69ddff", "#ffe177"],
-    ground: ["#5b351f", "#e27b38", "#ffd75a"],
-    accent: "#4ee86f",
+    sky: ["#9feaff", "#ffe9ad"],
+    ground: ["#765044", "#efa877", "#fff0a0"],
+    accent: "#85e7a9",
+    backdrop: {
+      cloud: "#fff9e8",
+      cloudShade: "#ffd7dc",
+      farHill: "#a9e0b5",
+      farHillShade: "#79c8ad",
+      skyline: "#ffd5a4",
+      skylineShade: "#f3a8a8",
+      meadow: "#9ee9b7",
+      sparkle: "#fff8ca",
+      kite: "#ff91ad"
+    },
     spawn: { x: 28, y: 126 },
     goal: { x: 1426, y: 98 },
     platforms: [
@@ -318,9 +329,20 @@ const levels = [
   {
     name: "2-2 Månkvarnen",
     width: 1700,
-    sky: ["#3c58d6", "#c27cff"],
-    ground: ["#2f315c", "#6d65cc", "#7ce6ff"],
-    accent: "#ffe66f",
+    sky: ["#b9d0ff", "#f2baff"],
+    ground: ["#4f568c", "#9ca4ea", "#cbfbff"],
+    accent: "#fff0a8",
+    backdrop: {
+      cloud: "#f8f4ff",
+      cloudShade: "#d7ccff",
+      farHill: "#a8b6ed",
+      farHillShade: "#8a92d6",
+      skyline: "#cdb7f7",
+      skylineShade: "#9ea7ec",
+      meadow: "#b6ecf6",
+      sparkle: "#fff0b7",
+      kite: "#f5a6ff"
+    },
     spawn: { x: 28, y: 112 },
     goal: { x: 1622, y: 78 },
     platforms: [
@@ -358,9 +380,20 @@ const levels = [
   {
     name: "3-3 Prismaspiran",
     width: 1900,
-    sky: ["#7744c8", "#ff7aa8"],
-    ground: ["#3b285a", "#c15a95", "#74ffd8"],
-    accent: "#7cffdb",
+    sky: ["#c7abff", "#ffb5c9"],
+    ground: ["#5d4b80", "#dc8fb9", "#baffef"],
+    accent: "#9ffff0",
+    backdrop: {
+      cloud: "#fff1fb",
+      cloudShade: "#dfc4ff",
+      farHill: "#b896e0",
+      farHillShade: "#d68bc5",
+      skyline: "#f0a6c5",
+      skylineShade: "#a889e3",
+      meadow: "#b6f4dd",
+      sparkle: "#fff4c9",
+      kite: "#95fff3"
+    },
     spawn: { x: 28, y: 132 },
     goal: { x: 1824, y: 86 },
     platforms: [
@@ -591,7 +624,7 @@ function updatePlayer(dt) {
     player.grounded = false;
     player.coyote = 0;
     player.jumpBuffer = 0;
-    makeSpark(player.x + player.w / 2, player.y + player.h, "#f8f3d2");
+    makeSpark(player.x + player.w / 2, player.y + player.h, "#fff5ce");
   }
 
   if (!jumpDown && player.vy < -80) player.vy += 520 * dt;
@@ -623,7 +656,7 @@ function updateEnemies(dt) {
       enemy.alive = false;
       player.vy = -210;
       state.score += 25;
-      makeSpark(enemy.x + enemy.w / 2, enemy.y + 4, "#7cff9b");
+      makeSpark(enemy.x + enemy.w / 2, enemy.y + 4, "#96efb5");
       updateHud();
     } else {
       damagePlayer();
@@ -648,7 +681,7 @@ function updateBoss(dt) {
       vx: player.x < boss.x ? -95 : 95,
       vy: -18,
       life: 2.3,
-      color: "#ff6262",
+      color: "#ff7f8f",
       hostile: true,
       w: 6,
       h: 6
@@ -662,11 +695,11 @@ function updateBoss(dt) {
     boss.hurt = 0.35;
     player.vy = -250;
     state.score += 50;
-    makeSpark(boss.x + boss.w / 2, boss.y + 8, "#f8f3d2");
+    makeSpark(boss.x + boss.w / 2, boss.y + 8, "#fff5ce");
     if (boss.hp <= 0) {
       boss.alive = false;
       state.score += 250;
-      makeSpark(boss.x + boss.w / 2, boss.y + 18, "#7cffdb");
+      makeSpark(boss.x + boss.w / 2, boss.y + 18, "#9ffff0");
       completeRun();
     }
     updateHud();
@@ -680,7 +713,7 @@ function updatePickups() {
     if (pickup.taken || !rectsTouch(player, pickup)) continue;
     pickup.taken = true;
     state.score += 10;
-    makeSpark(pickup.x + 4, pickup.y + 4, "#62d6ff");
+    makeSpark(pickup.x + 4, pickup.y + 4, "#7be7ff");
     updateHud();
   }
 }
@@ -751,62 +784,105 @@ function update(dt) {
   pressed.clear();
 }
 
+function wrapLayerX(worldX, cameraFactor, span, pad = 0) {
+  const shifted = worldX - state.cameraX * cameraFactor;
+  return Math.floor(((shifted + pad) % span + span) % span - pad);
+}
+
+function drawCloudCluster(x, y, scale, colors) {
+  ctx.fillStyle = colors.cloudShade;
+  ctx.fillRect(x + 7 * scale, y + 7 * scale, 31 * scale, 7 * scale);
+  ctx.fillRect(x + 17 * scale, y + 2 * scale, 26 * scale, 11 * scale);
+  ctx.fillStyle = colors.cloud;
+  ctx.fillRect(x, y + 9 * scale, 33 * scale, 8 * scale);
+  ctx.fillRect(x + 10 * scale, y + 4 * scale, 31 * scale, 10 * scale);
+  ctx.fillRect(x + 31 * scale, y + 10 * scale, 21 * scale, 7 * scale);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.fillRect(x + 12 * scale, y + 6 * scale, 13 * scale, 2 * scale);
+}
+
+function drawPixelHill(x, baseY, width, height, colors, shadeShift = 0) {
+  ctx.fillStyle = colors.farHill;
+  ctx.beginPath();
+  ctx.moveTo(x, baseY);
+  ctx.lineTo(x + width * 0.48, baseY - height);
+  ctx.lineTo(x + width, baseY);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = colors.farHillShade;
+  ctx.beginPath();
+  ctx.moveTo(x + width * 0.48 + shadeShift, baseY - height);
+  ctx.lineTo(x + width, baseY);
+  ctx.lineTo(x + width * 0.58, baseY);
+  ctx.closePath();
+  ctx.fill();
+}
+
 function drawBackground() {
+  const backdrop = level.backdrop;
   const gradient = ctx.createLinearGradient(0, 0, 0, VIEW_H);
   gradient.addColorStop(0, level.sky[0]);
   gradient.addColorStop(1, level.sky[1]);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
-  const parallax = state.cameraX * 0.18;
-  ctx.fillStyle = "rgba(255,255,255,0.66)";
-  for (let i = 0; i < 10; i += 1) {
-    const x = Math.floor((i * 88 - parallax) % (VIEW_W + 112) - 50);
-    const y = 24 + (i % 3) * 19;
-    ctx.fillRect(x, y, 24, 7);
-    ctx.fillRect(x + 8, y - 6, 30, 9);
-    ctx.fillRect(x + 30, y + 2, 20, 6);
-    ctx.fillStyle = "rgba(255,255,255,0.34)";
-    ctx.fillRect(x + 12, y + 8, 18, 2);
-    ctx.fillStyle = "rgba(255,255,255,0.66)";
-  }
-
-  ctx.fillStyle = "rgba(47, 63, 128, 0.34)";
-  const hillOffset = state.cameraX * 0.32;
-  for (let i = 0; i < 8; i += 1) {
-    const x = i * 128 - (hillOffset % 128) - 40;
-    ctx.beginPath();
-    ctx.moveTo(x, 184);
-    ctx.lineTo(x + 72, 92 + (i % 2) * 18);
-    ctx.lineTo(x + 148, 184);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  const midOffset = state.cameraX * 0.48;
-  for (let i = 0; i < 13; i += 1) {
-    const x = Math.floor(i * 58 - (midOffset % 58) - 22);
-    const y = 153 + (i % 2) * 7;
-    ctx.fillStyle = i % 2 === 0
-      ? "rgba(124, 255, 155, 0.42)"
-      : "rgba(255, 214, 90, 0.38)";
-    ctx.fillRect(x, y + 14, 42, 17);
-    ctx.fillRect(x + 7, y + 7, 28, 9);
-    ctx.fillRect(x + 15, y, 12, 9);
-    ctx.fillStyle = "rgba(16, 19, 34, 0.18)";
-    ctx.fillRect(x + 8, y + 20, 5, 8);
-    ctx.fillRect(x + 27, y + 19, 5, 9);
-  }
-
-  ctx.fillStyle = "rgba(248, 243, 210, 0.42)";
-  for (let i = 0; i < 18; i += 1) {
-    const x = Math.floor((i * 47 - state.cameraX * 0.12) % (VIEW_W + 60) - 26);
-    const y = 20 + ((i * 29) % 92);
+  ctx.fillStyle = backdrop.sparkle;
+  for (let i = 0; i < 24; i += 1) {
+    const x = wrapLayerX(i * 53 + (i % 2) * 18, 0.06, VIEW_W + 90, 40);
+    const y = 18 + ((i * 31) % 86);
     ctx.fillRect(x, y, 2, 2);
-    if (i % 3 === 0) {
+    if (i % 4 === 0) {
       ctx.fillRect(x - 2, y + 2, 2, 2);
       ctx.fillRect(x + 2, y + 2, 2, 2);
     }
+  }
+
+  for (let i = 0; i < 9; i += 1) {
+    const x = wrapLayerX(i * 91 + 12, 0.14, VIEW_W + 140, 70);
+    const y = 24 + (i % 3) * 17 + (i % 2) * 3;
+    drawCloudCluster(x, y, 1, backdrop);
+  }
+
+  for (let i = 0; i < 7; i += 1) {
+    const x = wrapLayerX(i * 122 - 32, 0.24, VIEW_W + 160, 80);
+    drawPixelHill(x, 184, 148, 82 - (i % 3) * 10, backdrop, i % 2 === 0 ? 8 : -4);
+  }
+
+  for (let i = 0; i < 13; i += 1) {
+    const x = wrapLayerX(i * 52 + 5, 0.38, VIEW_W + 90, 44);
+    const h = 20 + (i % 4) * 7;
+    const y = 169 - h;
+    ctx.fillStyle = i % 2 === 0 ? backdrop.skyline : backdrop.skylineShade;
+    ctx.fillRect(x, y + 8, 37, h);
+    ctx.fillRect(x + 8, y, 21, 10);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.32)";
+    ctx.fillRect(x + 7, y + 14, 5, 5);
+    ctx.fillRect(x + 22, y + 16, 5, 5);
+    ctx.fillRect(x + 14, y + 28, 5, 5);
+    ctx.fillStyle = "rgba(16, 19, 34, 0.18)";
+    ctx.fillRect(x + 3, y + h + 2, 34, 3);
+  }
+
+  for (let i = 0; i < 16; i += 1) {
+    const x = wrapLayerX(i * 36, 0.58, VIEW_W + 70, 30);
+    const y = 170 + (i % 3) * 5;
+    ctx.fillStyle = i % 2 === 0 ? backdrop.meadow : backdrop.cloudShade;
+    ctx.fillRect(x, y + 8, 28, 7);
+    ctx.fillRect(x + 5, y + 3, 18, 8);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
+    ctx.fillRect(x + 9, y + 5, 8, 2);
+  }
+
+  ctx.fillStyle = backdrop.kite;
+  for (let i = 0; i < 5; i += 1) {
+    const x = wrapLayerX(i * 118 + 45, 0.2, VIEW_W + 100, 50);
+    const y = 42 + (i % 2) * 25;
+    ctx.fillRect(x + 3, y, 4, 4);
+    ctx.fillRect(x, y + 3, 10, 2);
+    ctx.fillStyle = "rgba(16, 19, 34, 0.22)";
+    ctx.fillRect(x + 5, y + 5, 1, 8);
+    ctx.fillStyle = backdrop.kite;
   }
 }
 
@@ -839,7 +915,7 @@ function drawHazard(hazard) {
   const y = Math.floor(hazard.y);
   ctx.fillStyle = "#1d1220";
   ctx.fillRect(x, y + 10, hazard.w, 8);
-  ctx.fillStyle = "#ff315f";
+  ctx.fillStyle = "#ff6f9d";
   for (let px = 0; px < hazard.w; px += 8) {
     ctx.beginPath();
     ctx.moveTo(x + px, y + 12);
@@ -847,9 +923,9 @@ function drawHazard(hazard) {
     ctx.lineTo(x + px + 8, y + 12);
     ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = "#ffd75a";
+    ctx.fillStyle = "#fff0a0";
     ctx.fillRect(x + px + 3, y + 5, 2, 4);
-    ctx.fillStyle = "#ff315f";
+    ctx.fillStyle = "#ff6f9d";
   }
 }
 
@@ -859,12 +935,12 @@ function drawPickup(pickup) {
   const y = Math.floor(pickup.y + Math.sin(performance.now() / 180 + pickup.bob) * 2);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 1, y + 1, 8, 8);
-  ctx.fillStyle = "#2de2ff";
+  ctx.fillStyle = "#7be7ff";
   ctx.fillRect(x + 3, y, 4, 10);
   ctx.fillRect(x + 1, y + 3, 8, 4);
-  ctx.fillStyle = "#b9fbff";
+  ctx.fillStyle = "#dffbff";
   ctx.fillRect(x + 4, y + 2, 2, 2);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.fillRect(x + 6, y + 1, 2, 2);
 }
 
@@ -874,17 +950,17 @@ function drawEnemy(enemy) {
   const y = Math.floor(enemy.y);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 1, y + 3, enemy.w + 2, enemy.h);
-  ctx.fillStyle = enemy.type === "flutter" ? "#ff7fc9" : "#b9ff39";
+  ctx.fillStyle = enemy.type === "flutter" ? "#ffa6dc" : "#cfff74";
   ctx.fillRect(x, y + 2, enemy.w + 2, enemy.h - 2);
   ctx.fillRect(x + 3, y, enemy.w - 4, 4);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + (enemy.vx > 0 ? 10 : 3), y + 4, 2, 2);
   ctx.fillRect(x + (enemy.vx > 0 ? 4 : 10), y + 9, 4, 2);
   if (enemy.type === "flutter") {
-    ctx.fillStyle = "#f8f3d2";
+    ctx.fillStyle = "#fff5ce";
     ctx.fillRect(x - 5, y + 2, 5, 6);
     ctx.fillRect(x + enemy.w + 2, y + 2, 5, 6);
-    ctx.fillStyle = "#ffd75a";
+    ctx.fillStyle = "#fff0a0";
     ctx.fillRect(x - 3, y + 4, 3, 2);
     ctx.fillRect(x + enemy.w + 2, y + 4, 3, 2);
   }
@@ -896,21 +972,21 @@ function drawBoss() {
   const y = Math.floor(boss.y);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 3, y + 3, boss.w + 2, boss.h + 1);
-  ctx.fillStyle = boss.hurt > 0 ? "#f8f3d2" : "#9c79ff";
+  ctx.fillStyle = boss.hurt > 0 ? "#fff5ce" : "#b99bff";
   ctx.fillRect(x, y + 9, boss.w + 2, boss.h - 9);
-  ctx.fillStyle = "#5cf1ff";
+  ctx.fillStyle = "#9ffff0";
   ctx.fillRect(x + 5, y + 14, 21, 5);
-  ctx.fillStyle = "#ff4f8b";
+  ctx.fillStyle = "#ff86b2";
   ctx.fillRect(x + 4, y, 22, 13);
-  ctx.fillStyle = "#ffd75a";
+  ctx.fillStyle = "#fff0a0";
   ctx.fillRect(x + 8, y + 2, 4, 4);
   ctx.fillRect(x + 18, y + 2, 4, 4);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 8, y + 18, 4, 4);
   ctx.fillRect(x + 19, y + 18, 4, 4);
-  ctx.fillStyle = "#74ffd8";
+  ctx.fillStyle = "#baffef";
   ctx.fillRect(x + 9, y + 29, 14, 5);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.fillRect(x + 12, y + 34, 8, 3);
 }
 
@@ -920,19 +996,19 @@ function drawPlayer() {
   if (player.inv > 0 && Math.floor(player.inv * 14) % 2 === 0) return;
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 2, y + 2, player.w + 1, player.h);
-  ctx.fillStyle = "#ffd447";
+  ctx.fillStyle = "#ffe48a";
   ctx.fillRect(x + 2, y, 9, 6);
   ctx.fillRect(x + 1, y + 4, 11, 3);
-  ctx.fillStyle = "#25d68b";
+  ctx.fillStyle = "#82e9ad";
   ctx.fillRect(x + 1, y + 7, 11, 8);
-  ctx.fillStyle = "#ff5d7d";
+  ctx.fillStyle = "#ff8eaa";
   ctx.fillRect(x + (player.dir > 0 ? 0 : 9), y + 8, 3, 5);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.fillRect(x + (player.dir > 0 ? 8 : 2), y + 2, 2, 2);
-  ctx.fillStyle = "#244ecb";
+  ctx.fillStyle = "#6f8fee";
   ctx.fillRect(x + 1, y + 14, 4, 3);
   ctx.fillRect(x + 8, y + 14, 4, 3);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.fillRect(x + (player.dir > 0 ? 11 : -1), y + 9, 2, 2);
 }
 
@@ -943,11 +1019,11 @@ function drawGoal() {
   ctx.fillRect(x, y, 5, 88);
   ctx.fillStyle = level.accent;
   ctx.fillRect(x + 5, y + 6, 17, 18);
-  ctx.fillStyle = "#ff4f8b";
+  ctx.fillStyle = "#ff86b2";
   ctx.fillRect(x + 8, y + 9, 11, 4);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.fillRect(x + 10, y + 14, 6, 6);
-  ctx.fillStyle = "#ffd75a";
+  ctx.fillStyle = "#fff0a0";
   ctx.fillRect(x - 3, y + 84, 12, 4);
 }
 
@@ -964,7 +1040,7 @@ function drawToast() {
   if (toastTimer <= 0) return;
   ctx.fillStyle = "rgba(16, 19, 34, 0.86)";
   ctx.fillRect(86, 16, 214, 22);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.font = "8px monospace";
   ctx.textAlign = "center";
   ctx.fillText(toastText, 193, 31);
@@ -976,24 +1052,24 @@ function drawEnding() {
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   for (const star of endingStars) {
-    ctx.fillStyle = star.size === 1 ? "#62d6ff" : star.size === 2 ? "#f8f3d2" : "#ff9ccc";
+    ctx.fillStyle = star.size === 1 ? "#8eeaff" : star.size === 2 ? "#fff5ce" : "#ffb4d8";
     ctx.fillRect(Math.floor(star.x), Math.floor(star.y), star.size, star.size);
   }
 
-  ctx.fillStyle = "#242844";
+  ctx.fillStyle = "#3b3f68";
   ctx.fillRect(0, 172, VIEW_W, 44);
-  ctx.fillStyle = "#69f0ca";
+  ctx.fillStyle = "#9ffff0";
   ctx.fillRect(0, 172, VIEW_W, 3);
 
   ctx.textAlign = "center";
-  ctx.fillStyle = "#7cff9b";
+  ctx.fillStyle = "#96efb5";
   ctx.font = "22px monospace";
   ctx.fillText("HIMMELRELÄET TÄNT", VIEW_W / 2, 45);
-  ctx.fillStyle = "#f8f3d2";
+  ctx.fillStyle = "#fff5ce";
   ctx.font = "9px monospace";
   ctx.fillText("tre torn lyser över glödvägen", VIEW_W / 2, 64);
 
-  const colors = ["#ffcf5a", "#4fe0a7", "#ff9ccc"];
+  const colors = ["#ffe48a", "#82e9ad", "#ffb4d8"];
   for (let i = 0; i < 3; i += 1) {
     const x = 151 + i * 38;
     const y = 120 + Math.sin(performance.now() / 220 + i) * 2;
@@ -1001,13 +1077,13 @@ function drawEnding() {
     ctx.fillRect(x + 2, y + 2, 14, 22);
     ctx.fillStyle = colors[i];
     ctx.fillRect(x, y + 8, 14, 14);
-    ctx.fillStyle = "#f8f3d2";
+    ctx.fillStyle = "#fff5ce";
     ctx.fillRect(x + 3, y, 8, 8);
     ctx.fillStyle = "#101322";
     ctx.fillRect(x + 8, y + 3, 2, 2);
   }
 
-  ctx.fillStyle = "#f2b84b";
+  ctx.fillStyle = "#ffd27a";
   ctx.font = "8px monospace";
   ctx.fillText("MEDVERKAN", VIEW_W / 2, 87);
   ctx.fillStyle = "#d8ddff";

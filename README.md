@@ -28,7 +28,7 @@ Musiken är en egen chiptune-liknande slinga som skapas i `src/game.js` med Web 
 
 ## Visuell Stil
 
-All bangrafik ritas vid körning med egna pixelformer i canvas. De ljusa paletterna, kraftiga figursilhuetterna, kristallerna, reläflaggorna, fienderna, bossen, bakgrundskullarna, molnklustren och horisontdetaljerna är gjorda för detta projekt och använder inga franchisekopplade sprites, logotyper, kopierade blockdesigner eller kopierade banor.
+All bangrafik ritas vid körning med egna pixelformer i canvas. De mjukare pastellpaletterna, kraftiga figursilhuetterna, kristallerna, reläflaggorna, fienderna, bossen, parallaxlagren i himlen, molnklustren, de rullande kullarna, horisontdetaljerna och ängsförgrunderna är gjorda för detta projekt och använder inga franchisekopplade sprites, logotyper, kopierade paletter, kopierade blockdesigner eller kopierade banor.
 
 ## Spelstruktur
 

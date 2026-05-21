@@ -11,7 +11,12 @@ const ui = {
   bossHud: document.querySelector("#bossHud"),
   bossHearts: document.querySelector("#bossHearts"),
   message: document.querySelector("#message"),
+  menuTitle: document.querySelector("#menuTitle"),
+  menuBody: document.querySelector("#menuBody"),
+  menuStatus: document.querySelector("#menuStatus"),
   startButton: document.querySelector("#startButton"),
+  restartButton: document.querySelector("#restartButton"),
+  menuMusicButton: document.querySelector("#menuMusicButton"),
   musicButton: document.querySelector("#musicButton")
 };
 
@@ -111,6 +116,9 @@ const music = (() => {
   function updateButton() {
     ui.musicButton.textContent = muted ? "Spela" : "Tysta";
     ui.musicButton.setAttribute("aria-pressed", String(muted));
+    ui.menuMusicButton.textContent = muted ? "Melodi av" : "Melodi på";
+    ui.menuMusicButton.setAttribute("aria-pressed", String(muted));
+    ui.menuStatus.textContent = muted ? "Melodi: tystad" : "Melodi: på";
   }
 
   function noteToHz(note) {
@@ -480,13 +488,29 @@ function startGame() {
   loadLevel(0);
 }
 
+function setMenuTitle(title) {
+  ui.menuTitle.textContent = "";
+  const parts = title.includes(": ") ? title.split(": ") : [title];
+  for (const part of parts) {
+    const span = document.createElement("span");
+    span.textContent = part;
+    ui.menuTitle.append(span);
+  }
+}
+
+function updateMenuControls() {
+  ui.message.dataset.screen = state.mode;
+  ui.restartButton.textContent = state.mode === "lost" ? "Starta om bana" : "Starta om";
+}
+
 function showMessage(title, body, button) {
   state.messageTitle = title;
   state.messageBody = body;
   state.messageButton = button;
-  ui.message.querySelector("h1").textContent = title;
-  ui.message.querySelector("p").textContent = body;
+  setMenuTitle(title);
+  ui.menuBody.textContent = body;
   ui.startButton.textContent = button;
+  updateMenuControls();
   ui.message.hidden = false;
 }
 
@@ -517,6 +541,12 @@ function completeRun() {
     `Alla tre torn lyser klart. Slutpoäng: ${state.score} prismagnistor. Medverkan: form, kod, ljud och pixelkonst av relägruppen.`,
     "Ny runda"
   );
+}
+
+function activatePrimaryMenuAction() {
+  startMusicFromGesture();
+  if (state.mode === "lost") restartStage();
+  else startGame();
 }
 
 function updateHud() {
@@ -1093,6 +1123,64 @@ function drawEnding() {
   ctx.textAlign = "left";
 }
 
+function drawTitleAttract() {
+  const time = performance.now() / 1000;
+  const gradient = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+  gradient.addColorStop(0, "#161a3d");
+  gradient.addColorStop(0.55, "#564e9e");
+  gradient.addColorStop(1, "#ffb06e");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  ctx.fillStyle = "#fff0a0";
+  for (let i = 0; i < 54; i += 1) {
+    const x = (i * 47 + Math.floor(time * 9)) % VIEW_W;
+    const y = 10 + ((i * 29) % 106);
+    ctx.fillRect(x, y, i % 5 === 0 ? 3 : 2, i % 3 === 0 ? 3 : 2);
+  }
+
+  ctx.fillStyle = "#7be7ff";
+  ctx.fillRect(0, 156, VIEW_W, 4);
+  ctx.fillStyle = "#20254f";
+  ctx.fillRect(0, 160, VIEW_W, 56);
+  ctx.fillStyle = "#11142b";
+  for (let x = 0; x < VIEW_W; x += 32) {
+    const h = 20 + ((x / 32) % 4) * 7;
+    ctx.fillRect(x, 160 - h, 22, h);
+    ctx.fillRect(x + 7, 154 - h, 8, 8);
+  }
+
+  for (let i = 0; i < 3; i += 1) {
+    const x = 78 + i * 92;
+    const pulse = Math.floor((Math.sin(time * 4 + i) + 1) * 2);
+    ctx.fillStyle = "#101322";
+    ctx.fillRect(x - 5, 75, 26, 83);
+    ctx.fillStyle = i === 1 ? "#96efb5" : "#7be7ff";
+    ctx.fillRect(x, 86, 16, 72);
+    ctx.fillStyle = "#ff86b2";
+    ctx.fillRect(x - 4, 75, 24, 13);
+    ctx.fillStyle = "#fff8e8";
+    ctx.fillRect(x + 5, 92, 6, 54 - pulse);
+    ctx.fillStyle = "#fff0a0";
+    ctx.fillRect(x + 3, 66 - pulse, 10, 8);
+    ctx.fillRect(x + 6, 60 - pulse, 4, 18);
+  }
+
+  const runnerX = 186 + Math.sin(time * 2.8) * 12;
+  const runnerY = 142 + Math.sin(time * 12) * 2;
+  ctx.fillStyle = "#101322";
+  ctx.fillRect(runnerX + 2, runnerY + 2, 15, 22);
+  ctx.fillStyle = "#ffe48a";
+  ctx.fillRect(runnerX + 4, runnerY, 9, 7);
+  ctx.fillStyle = "#82e9ad";
+  ctx.fillRect(runnerX + 3, runnerY + 8, 11, 9);
+  ctx.fillStyle = "#ff86b2";
+  ctx.fillRect(runnerX + 13, runnerY + 9, 4, 7);
+  ctx.fillStyle = "#6f8fee";
+  ctx.fillRect(runnerX + 2, runnerY + 18, 5, 4);
+  ctx.fillRect(runnerX + 10, runnerY + 18, 5, 4);
+}
+
 function draw() {
   if (!level) {
     level = levels[0];
@@ -1100,6 +1188,10 @@ function draw() {
   }
   if (state.mode === "ending") {
     drawEnding();
+    return;
+  }
+  if (state.mode === "title") {
+    drawTitleAttract();
     return;
   }
   drawBackground();
@@ -1147,8 +1239,7 @@ window.addEventListener("keydown", (event) => {
     music.toggleMuted();
   }
   if (event.code === "Enter" && state.mode !== "playing") {
-    startMusicFromGesture();
-    startGame();
+    activatePrimaryMenuAction();
   }
   if (event.code === "KeyR") {
     startMusicFromGesture();
@@ -1161,13 +1252,19 @@ window.addEventListener("keyup", (event) => {
   keys.delete(event.code);
 });
 
-ui.startButton.addEventListener("click", () => {
+ui.startButton.addEventListener("click", activatePrimaryMenuAction);
+
+ui.restartButton.addEventListener("click", () => {
   startMusicFromGesture();
-  if (state.mode === "lost") restartStage();
-  else startGame();
+  restartStage();
 });
 
 ui.musicButton.addEventListener("click", () => {
+  startMusicFromGesture();
+  music.toggleMuted();
+});
+
+ui.menuMusicButton.addEventListener("click", () => {
   startMusicFromGesture();
   music.toggleMuted();
 });

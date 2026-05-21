@@ -7,6 +7,8 @@
   --cyan: #7be7ff;
   --mint: #96efb5;
   --danger: #ff86b2;
+  --shadow: #101322;
+  --violet: #7062c8;
 }
 
 * {
@@ -28,8 +30,8 @@ body {
 }
 
 button {
-  border: 3px solid #101322;
-  box-shadow: 0 4px 0 #101322;
+  border: 3px solid var(--shadow);
+  box-shadow: 0 4px 0 var(--shadow);
   background: var(--edge);
   color: #17131b;
   cursor: pointer;
@@ -40,7 +42,7 @@ button {
 
 button:active {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 #101322;
+  box-shadow: 0 1px 0 var(--shadow);
 }
 
 .shell {
@@ -63,8 +65,8 @@ button:active {
   gap: 10px;
   padding: 10px 12px;
   background: var(--panel);
-  border: 4px solid #101322;
-  box-shadow: 0 5px 0 #101322, inset 0 3px 0 rgba(255, 255, 255, 0.12);
+  border: 4px solid var(--shadow);
+  box-shadow: 0 5px 0 var(--shadow), inset 0 3px 0 rgba(255, 255, 255, 0.12);
 }
 
 .hud {
@@ -122,42 +124,177 @@ canvas {
   width: 100%;
   aspect-ratio: 16 / 9;
   background: #9feaff;
-  border: 6px solid #101322;
-  box-shadow: 0 8px 0 #101322, 0 0 0 4px #fff0a0;
+  border: 6px solid var(--shadow);
+  box-shadow: 0 8px 0 var(--shadow), 0 0 0 4px #fff0a0;
   image-rendering: pixelated;
 }
 
 .message {
   position: absolute;
-  inset: 64px 14px 50px;
+  inset: 66px 18px 54px;
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: clamp(12px, 2.2vw, 22px);
   text-align: center;
-  background: rgba(18, 20, 42, 0.88);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 240, 160, 0.12) 0 3px, transparent 3px 13px),
+    linear-gradient(180deg, rgba(18, 20, 42, 0.96), rgba(48, 52, 100, 0.94));
   border: 4px solid var(--edge);
-  box-shadow: inset 0 0 0 3px rgba(123, 231, 255, 0.35), 0 6px 0 #101322;
+  box-shadow: inset 0 0 0 3px rgba(123, 231, 255, 0.35), 0 6px 0 var(--shadow);
 }
 
 .message[hidden] {
   display: none;
 }
 
-.message h1 {
-  margin: 0;
-  color: var(--mint);
-  font-size: clamp(1.7rem, 6vw, 4rem);
-  line-height: 0.95;
-  text-shadow: 4px 4px 0 #101322, 0 0 12px rgba(150, 239, 181, 0.35);
+.message::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px);
+  mix-blend-mode: screen;
 }
 
-.message p {
+.title-scene {
+  position: relative;
+  width: min(76%, 430px);
+  height: clamp(34px, 8vw, 56px);
+  border-bottom: 4px solid var(--mint);
+}
+
+.pixel-sun,
+.pixel-tower,
+.pixel-runner {
+  position: absolute;
+  image-rendering: pixelated;
+}
+
+.pixel-sun {
+  left: 50%;
+  bottom: 12px;
+  width: 40px;
+  height: 28px;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, transparent 0 6px, #fff0a0 6px 34px, transparent 34px),
+    linear-gradient(180deg, #fff0a0 0 12px, #ff86b2 12px 20px, #7062c8 20px);
+  box-shadow: 0 0 0 3px var(--shadow), 0 0 0 7px rgba(123, 231, 255, 0.25);
+}
+
+.pixel-tower {
+  bottom: 0;
+  width: 18px;
+  height: 38px;
+  background:
+    linear-gradient(90deg, #7be7ff 0 5px, #fff8e8 5px 13px, #7be7ff 13px),
+    linear-gradient(180deg, #ff86b2 0 8px, transparent 8px);
+  box-shadow: 0 0 0 3px var(--shadow);
+}
+
+.tower-left {
+  left: 16%;
+}
+
+.tower-right {
+  right: 16%;
+  height: 46px;
+}
+
+.pixel-runner {
+  right: 34%;
+  bottom: -2px;
+  width: 18px;
+  height: 22px;
+  background:
+    linear-gradient(90deg, transparent 0 4px, #ffe48a 4px 13px, transparent 13px),
+    linear-gradient(180deg, #ffe48a 0 7px, #82e9ad 7px 17px, #6f8fee 17px);
+  box-shadow: 0 0 0 3px var(--shadow);
+  animation: runner-bob 0.8s steps(2, end) infinite;
+}
+
+.menu-kicker,
+.menu-status {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #dffbff;
+  font-size: clamp(0.7rem, 1.6vw, 0.85rem);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.message h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--edge);
+  font-size: clamp(1.75rem, 6vw, 4.35rem);
+  line-height: 0.95;
+  text-shadow: 4px 4px 0 var(--shadow), 0 7px 0 var(--violet), 0 0 12px rgba(150, 239, 181, 0.35);
+  text-transform: uppercase;
+}
+
+.message h1 span {
+  display: block;
+}
+
+.menu-copy {
+  position: relative;
+  z-index: 1;
   max-width: 580px;
   margin: 0;
   color: #fff5ce;
   font-size: clamp(0.95rem, 2vw, 1.2rem);
+}
+
+.menu-actions,
+.menu-prompts {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.menu-actions button {
+  min-width: 132px;
+  padding: 0.72rem 0.86rem;
+  font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+}
+
+.menu-actions .primary-action {
+  background: var(--mint);
+}
+
+#menuMusicButton[aria-pressed="true"] {
+  background: #ffa6dc;
+}
+
+.menu-prompts {
+  max-width: 620px;
+  color: #eef2ff;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  text-transform: uppercase;
+}
+
+kbd {
+  display: inline-grid;
+  min-width: 30px;
+  min-height: 22px;
+  place-items: center;
+  margin-right: 4px;
+  padding: 2px 6px;
+  border: 2px solid var(--shadow);
+  background: #fff8e8;
+  color: var(--shadow);
+  box-shadow: 0 2px 0 var(--shadow);
+  font: 800 0.78rem/1 "Trebuchet MS", Arial, sans-serif;
 }
 
 .controls {
@@ -179,5 +316,55 @@ canvas {
 
   .message {
     inset: 70px 10px 58px;
+    gap: 7px;
+  }
+
+  .title-scene {
+    width: 90%;
+    height: 30px;
+  }
+
+  .pixel-sun {
+    width: 30px;
+    height: 20px;
+  }
+
+  .pixel-tower {
+    height: 28px;
+  }
+
+  .tower-right {
+    height: 32px;
+  }
+
+  .pixel-runner {
+    width: 14px;
+    height: 18px;
+  }
+
+  .menu-actions button {
+    min-width: 118px;
+    padding: 0.58rem 0.62rem;
+  }
+
+  .menu-prompts {
+    gap: 5px;
+  }
+
+  kbd {
+    min-width: 26px;
+    min-height: 20px;
+    padding: 1px 4px;
+  }
+}
+
+@keyframes runner-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
   }
 }

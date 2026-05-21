@@ -14,13 +14,18 @@ Gå sedan till `http://127.0.0.1:8765`.
 
 ## Kontroller
 
+- Titelmenyn öppnas först och kan styras med både knappar och tangentbord
 - Spring: `A` / `D` eller vänster / höger pil
 - Hoppa: `W`, uppåtpil eller mellanslag
 - Spring in i ett hopp för att få lite extra höjd av farten
-- Tysta eller spela den egna melodin: `M` eller knappen Melodi
-- Försök igen på aktuell bana: `R`
-- Starta från titel- eller slutskärmen: `Enter`
-- Återgå till titelmenyn: `Esc`
+- Starta från titel-, förlust- eller slutskärmen: `Enter` eller knappen Starta
+- Starta om från titel-, spel-, förlust- eller slutskärmen: `R` eller knappen Starta om
+- Tysta eller spela den egna melodin: `M`, knappen Melodi i titelmenyn eller knappen Melodi i HUD:en
+- Återgå till titelmenyn under spel: `Esc`
+
+## Titelmeny
+
+Spelet börjar på en egen retroinspirerad titelmeny med pixelritad relästad i canvas, original titelbehandling, startknapp, starta om-knapp, melodistatus och tangentprompter för `Enter`, `R`, `M` och `Esc`. Menyn använder egna namn, egen form och egna pixelelement och innehåller inga Nintendo- eller Mario-namn, logotyper, figurer, layouter eller kopierade assets.
 
 ## Ljud
 

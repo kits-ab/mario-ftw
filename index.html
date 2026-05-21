@@ -34,10 +34,31 @@
 
         <canvas id="game" width="384" height="216" aria-label="Glödloppet: Himmelreläet"></canvas>
 
-        <div id="message" class="message">
-          <h1>Glödloppet: Himmelreläet</h1>
-          <p>Rusa längs glödvägen, samla prismagnistor och tänd tre torn innan himmelnätet bleknar.</p>
-          <button id="startButton" type="button">Starta reläet</button>
+        <div id="message" class="message" role="dialog" aria-labelledby="menuTitle" aria-describedby="menuBody">
+          <div class="title-scene" aria-hidden="true">
+            <span class="pixel-sun"></span>
+            <span class="pixel-tower tower-left"></span>
+            <span class="pixel-tower tower-right"></span>
+            <span class="pixel-runner"></span>
+          </div>
+          <p class="menu-kicker">8-bitars reläarkad</p>
+          <h1 id="menuTitle">
+            <span>Glödloppet</span>
+            <span>Himmelreläet</span>
+          </h1>
+          <p id="menuBody" class="menu-copy">Rusa längs glödvägen, samla prismagnistor och tänd tre torn innan himmelnätet bleknar.</p>
+          <div class="menu-actions" aria-label="Titelmeny">
+            <button id="startButton" class="primary-action" type="button">Starta reläet</button>
+            <button id="restartButton" type="button">Starta om</button>
+            <button id="menuMusicButton" type="button" aria-pressed="false">Melodi på</button>
+          </div>
+          <div class="menu-prompts" aria-label="Tangentprompter">
+            <span><kbd>Enter</kbd> start</span>
+            <span><kbd>R</kbd> starta om</span>
+            <span><kbd>M</kbd> melodi</span>
+            <span><kbd>Esc</kbd> titel</span>
+          </div>
+          <p id="menuStatus" class="menu-status">Melodi: på</p>
         </div>
 
         <div class="controls" aria-label="Tangentbordskontroller">

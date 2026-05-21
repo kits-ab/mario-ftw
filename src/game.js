@@ -18,6 +18,10 @@ const ui = {
 const VIEW_W = canvas.width;
 const VIEW_H = canvas.height;
 const GRAVITY = 760;
+const BASE_JUMP_SPEED = 276;
+const RUN_JUMP_BONUS = 34;
+const RUN_JUMP_MIN_SPEED = 42;
+const RUN_JUMP_FULL_SPEED = 110;
 const keys = new Set();
 const pressed = new Set();
 
@@ -527,6 +531,14 @@ function makeSpark(x, y, color) {
   }
 }
 
+function getJumpSpeed() {
+  const runSpeed = Math.abs(player.vx);
+  if (runSpeed <= RUN_JUMP_MIN_SPEED) return BASE_JUMP_SPEED;
+
+  const runRatio = Math.min(1, (runSpeed - RUN_JUMP_MIN_SPEED) / (RUN_JUMP_FULL_SPEED - RUN_JUMP_MIN_SPEED));
+  return BASE_JUMP_SPEED + RUN_JUMP_BONUS * runRatio;
+}
+
 function updatePlayer(dt) {
   const left = keys.has("ArrowLeft") || keys.has("KeyA");
   const right = keys.has("ArrowRight") || keys.has("KeyD");
@@ -553,7 +565,7 @@ function updatePlayer(dt) {
   player.coyote = Math.max(0, player.coyote - dt);
 
   if (player.jumpBuffer > 0 && (player.grounded || player.coyote > 0)) {
-    player.vy = -276;
+    player.vy = -getJumpSpeed();
     player.grounded = false;
     player.coyote = 0;
     player.jumpBuffer = 0;

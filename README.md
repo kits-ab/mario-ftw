@@ -16,6 +16,7 @@ Then visit `http://127.0.0.1:8765`.
 
 - Move: `A` / `D` or left / right arrows
 - Jump: `W`, up arrow, or space
+- Run into a jump to gain a little extra height from your horizontal speed
 - Mute/unmute original music: `M` or the Audio button
 - Restart current stage: `R`
 - Start from title or win screen: `Enter`

@@ -93,6 +93,29 @@ button:active {
   color: var(--danger);
 }
 
+.audio-hud {
+  display: grid;
+  gap: 3px;
+}
+
+.hud-button {
+  min-width: 86px;
+  padding: 0.42rem 0.58rem;
+  border-width: 2px;
+  box-shadow: 0 3px 0 #101322;
+  font-size: 0.72rem;
+}
+
+.hud-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #101322;
+}
+
+.hud-button[aria-pressed="true"] {
+  background: #b7bfdf;
+  color: #242844;
+}
+
 canvas {
   display: block;
   width: 100%;

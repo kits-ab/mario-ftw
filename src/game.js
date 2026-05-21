@@ -11,7 +11,8 @@ const ui = {
   bossHud: document.querySelector("#bossHud"),
   bossHearts: document.querySelector("#bossHearts"),
   message: document.querySelector("#message"),
-  startButton: document.querySelector("#startButton")
+  startButton: document.querySelector("#startButton"),
+  musicButton: document.querySelector("#musicButton")
 };
 
 const VIEW_W = canvas.width;
@@ -30,6 +31,203 @@ const state = {
   messageButton: "Start Run",
   lastTime: 0
 };
+
+const music = (() => {
+  const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+  const noteOffsets = {
+    C: 0,
+    "C#": 1,
+    D: 2,
+    "D#": 3,
+    E: 4,
+    F: 5,
+    "F#": 6,
+    G: 7,
+    "G#": 8,
+    A: 9,
+    "A#": 10,
+    B: 11
+  };
+  const sections = [
+    {
+      bass: ["C2", "C2", "G1", "A#1", "F2", "F2", "G2", "G1"],
+      arp: ["C4", "E4", "G4", "A#4", "F4", "A4", "C5", "D5"],
+      lead: [
+        "E5", null, "G5", null, "A#5", "G5", null, "E5",
+        "D5", null, "C5", null, "D5", "E5", null, null,
+        "G5", null, "A#5", null, "C6", "A#5", "G5", null,
+        "F5", null, "D5", null, "E5", null, null, null
+      ]
+    },
+    {
+      bass: ["D2", "D2", "A1", "C2", "G1", "G1", "A1", "C2"],
+      arp: ["D4", "F4", "A4", "C5", "G4", "A#4", "D5", "F5"],
+      lead: [
+        "F5", null, "A5", null, "C6", "A5", null, "F5",
+        "E5", null, "D5", "E5", "F5", null, null, null,
+        "A5", null, "C6", null, "D6", "C6", "A5", null,
+        "G5", null, "E5", null, "F5", null, null, null
+      ]
+    },
+    {
+      bass: ["F2", "F2", "C2", "D#2", "A#1", "A#1", "C2", "D#2"],
+      arp: ["F4", "G#4", "C5", "D#5", "A#4", "D5", "F5", "G5"],
+      lead: [
+        "G#5", null, "C6", null, "D#6", "C6", "G#5", null,
+        "G5", null, "F5", "G5", "G#5", null, null, null,
+        "C6", null, "D#6", null, "F6", "D#6", "C6", null,
+        "A#5", null, "G5", null, "G#5", null, null, null
+      ]
+    }
+  ];
+
+  let audioCtx = null;
+  let masterGain = null;
+  let noiseBuffer = null;
+  let active = false;
+  let muted = false;
+  let sectionIndex = 0;
+  let step = 0;
+  let nextStepTime = 0;
+
+  function updateButton() {
+    ui.musicButton.textContent = muted ? "Unmute" : "Mute";
+    ui.musicButton.setAttribute("aria-pressed", String(muted));
+  }
+
+  function noteToHz(note) {
+    const match = /^([A-G]#?)(-?\d)$/.exec(note);
+    if (!match) return 0;
+    const semitone = noteOffsets[match[1]] + (Number(match[2]) + 1) * 12;
+    return 440 * 2 ** ((semitone - 69) / 12);
+  }
+
+  function makeNoiseBuffer(ctx) {
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i += 1) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    return buffer;
+  }
+
+  function ensureContext() {
+    if (!AudioContextCtor) {
+      ui.musicButton.textContent = "No Audio";
+      ui.musicButton.disabled = true;
+      return null;
+    }
+    if (audioCtx) return audioCtx;
+    audioCtx = new AudioContextCtor();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = muted ? 0 : 0.18;
+    masterGain.connect(audioCtx.destination);
+    noiseBuffer = makeNoiseBuffer(audioCtx);
+    return audioCtx;
+  }
+
+  function playTone(note, time, duration, volume, type = "square", detune = 0) {
+    if (!note || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = noteToHz(note);
+    osc.detune.value = detune;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(volume, time + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start(time);
+    osc.stop(time + duration + 0.03);
+  }
+
+  function playNoise(time, duration, volume, frequency) {
+    if (!noiseBuffer || !audioCtx) return;
+    const source = audioCtx.createBufferSource();
+    const filter = audioCtx.createBiquadFilter();
+    const gain = audioCtx.createGain();
+    source.buffer = noiseBuffer;
+    filter.type = "highpass";
+    filter.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(volume, time + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+    source.start(time);
+    source.stop(time + duration + 0.02);
+  }
+
+  function scheduleStep(currentStep, time) {
+    const section = sections[sectionIndex % sections.length];
+    const sixteenth = 60 / 138 / 4;
+    const leadNote = section.lead[currentStep % section.lead.length];
+
+    if (currentStep % 4 === 0) {
+      playTone(section.bass[Math.floor(currentStep / 4) % section.bass.length], time, sixteenth * 3.2, 0.18, "square", -9);
+    }
+    if (currentStep % 2 === 1) {
+      playTone(section.arp[Math.floor(currentStep / 2) % section.arp.length], time, sixteenth * 0.65, 0.045, "square", 4);
+    }
+    if (leadNote) {
+      playTone(leadNote, time, sixteenth * (currentStep % 8 === 4 ? 2.4 : 1.35), 0.105, "square");
+      playTone(leadNote, time + 0.012, sixteenth, 0.035, "square", -12);
+    }
+    if (currentStep % 8 === 0) {
+      playTone("C2", time, sixteenth * 1.7, 0.2, "triangle", -18);
+    }
+    if (currentStep % 8 === 4) {
+      playNoise(time, sixteenth * 1.1, 0.12, 1300);
+    }
+    if (currentStep % 2 === 0) {
+      playNoise(time, sixteenth * 0.28, 0.035, 5200);
+    }
+  }
+
+  function scheduler() {
+    if (!audioCtx || !active) return;
+    while (nextStepTime < audioCtx.currentTime + 0.12) {
+      scheduleStep(step, nextStepTime);
+      nextStepTime += 60 / 138 / 4;
+      step = (step + 1) % 32;
+    }
+  }
+
+  async function start() {
+    const ctx = ensureContext();
+    if (!ctx) return;
+    await ctx.resume();
+    if (!active) {
+      active = true;
+      nextStepTime = ctx.currentTime + 0.05;
+      window.setInterval(scheduler, 25);
+    }
+  }
+
+  function setMuted(nextMuted) {
+    muted = nextMuted;
+    updateButton();
+    if (masterGain && audioCtx) {
+      masterGain.gain.setTargetAtTime(muted ? 0 : 0.18, audioCtx.currentTime, 0.025);
+    }
+  }
+
+  function toggleMuted() {
+    setMuted(!muted);
+  }
+
+  function setLevel(index) {
+    if (sectionIndex === index) return;
+    sectionIndex = index;
+    step = 0;
+    if (audioCtx) nextStepTime = audioCtx.currentTime + 0.05;
+  }
+
+  updateButton();
+  return { setLevel, start, toggleMuted };
+})();
 
 const player = {
   x: 26,
@@ -202,6 +400,7 @@ function resetPlayer(spawn) {
 function loadLevel(index) {
   state.levelIndex = index;
   level = levels[index];
+  music.setLevel(index);
   cloneLevelObjects(level);
   resetPlayer(level.spawn);
   state.cameraX = 0;
@@ -670,14 +869,28 @@ function restartStage() {
   loadLevel(state.levelIndex);
 }
 
+function startMusicFromGesture() {
+  music.start().catch(() => {});
+}
+
 window.addEventListener("keydown", (event) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
     event.preventDefault();
   }
   if (!keys.has(event.code)) pressed.add(event.code);
   keys.add(event.code);
-  if (event.code === "Enter" && state.mode !== "playing") startGame();
-  if (event.code === "KeyR") restartStage();
+  if (event.code === "KeyM") {
+    startMusicFromGesture();
+    music.toggleMuted();
+  }
+  if (event.code === "Enter" && state.mode !== "playing") {
+    startMusicFromGesture();
+    startGame();
+  }
+  if (event.code === "KeyR") {
+    startMusicFromGesture();
+    restartStage();
+  }
 });
 
 window.addEventListener("keyup", (event) => {
@@ -685,8 +898,14 @@ window.addEventListener("keyup", (event) => {
 });
 
 ui.startButton.addEventListener("click", () => {
+  startMusicFromGesture();
   if (state.mode === "lost") restartStage();
   else startGame();
+});
+
+ui.musicButton.addEventListener("click", () => {
+  startMusicFromGesture();
+  music.toggleMuted();
 });
 
 showMessage(state.messageTitle, state.messageBody, state.messageButton);

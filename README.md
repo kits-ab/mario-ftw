@@ -16,8 +16,13 @@ Then visit `http://localhost:8000`.
 
 - Move: `A` / `D` or left / right arrows
 - Jump: `W`, up arrow, or space
+- Mute/unmute original music: `M` or the Audio button
 - Restart current stage: `R`
 - Start from title or win screen: `Enter`
+
+## Audio
+
+The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Start, `Enter`, `R`, or the Audio button.
 
 ## Game Structure
 

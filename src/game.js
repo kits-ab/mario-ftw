@@ -229,6 +229,13 @@ const music = (() => {
   return { setLevel, start, toggleMuted };
 })();
 
+const endingStars = Array.from({ length: 56 }, (_, index) => ({
+  x: (index * 53) % VIEW_W,
+  y: (index * 31) % VIEW_H,
+  size: 1 + (index % 3),
+  speed: 9 + (index % 5) * 5
+}));
+
 const player = {
   x: 26,
   y: 120,
@@ -428,6 +435,31 @@ function hideMessage() {
   ui.message.hidden = true;
 }
 
+function showTitle() {
+  state.mode = "title";
+  state.cameraX = 0;
+  level = levels[0];
+  cloneLevelObjects(level);
+  resetPlayer(level.spawn);
+  updateHud();
+  showMessage(
+    "Cinder Run: Sky Relay",
+    "An original pocket-sized platformer. Run, jump, collect prism crystals, and clear three stages.",
+    "Start Run"
+  );
+}
+
+function completeRun() {
+  state.mode = "ending";
+  state.cameraX = 0;
+  ui.bossHud.hidden = true;
+  showMessage(
+    "Relay Restored",
+    `You cleared all three stages with ${state.score} prism points. Credits: design, code, audio, and pixel art by the original relay team.`,
+    "Run Again"
+  );
+}
+
 function updateHud() {
   ui.levelName.textContent = level ? level.name : "1-1 Ember Fields";
   ui.score.textContent = String(state.score);
@@ -601,6 +633,7 @@ function updateBoss(dt) {
       boss.alive = false;
       state.score += 250;
       makeSpark(boss.x + boss.w / 2, boss.y + 18, "#7cffdb");
+      completeRun();
     }
     updateHud();
   } else {
@@ -651,8 +684,7 @@ function updateGoal() {
   if (state.levelIndex < levels.length - 1) {
     loadLevel(state.levelIndex + 1);
   } else {
-    state.mode = "won";
-    showMessage("Relay Restored", `You cleared all three stages with ${state.score} prism points.`, "Run Again");
+    completeRun();
   }
 }
 
@@ -664,10 +696,18 @@ function showToast(text) {
 }
 
 function update(dt) {
+  if (state.mode === "ending") {
+    for (const star of endingStars) {
+      star.y += star.speed * dt;
+      if (star.y > VIEW_H) star.y = -star.size;
+    }
+    return;
+  }
   if (state.mode !== "playing") return;
   updatePlayer(dt);
   updateEnemies(dt);
   updateBoss(dt);
+  if (state.mode !== "playing") return;
   updatePickups();
   updateHazards();
   updateSparks(dt);
@@ -834,10 +874,60 @@ function drawToast() {
   ctx.textAlign = "left";
 }
 
+function drawEnding() {
+  ctx.fillStyle = "#101322";
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  for (const star of endingStars) {
+    ctx.fillStyle = star.size === 1 ? "#62d6ff" : star.size === 2 ? "#f8f3d2" : "#ff9ccc";
+    ctx.fillRect(Math.floor(star.x), Math.floor(star.y), star.size, star.size);
+  }
+
+  ctx.fillStyle = "#242844";
+  ctx.fillRect(0, 172, VIEW_W, 44);
+  ctx.fillStyle = "#69f0ca";
+  ctx.fillRect(0, 172, VIEW_W, 3);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#7cff9b";
+  ctx.font = "22px monospace";
+  ctx.fillText("RELAY RESTORED", VIEW_W / 2, 45);
+  ctx.fillStyle = "#f8f3d2";
+  ctx.font = "9px monospace";
+  ctx.fillText("three towers lit the sky grid again", VIEW_W / 2, 64);
+
+  const colors = ["#ffcf5a", "#4fe0a7", "#ff9ccc"];
+  for (let i = 0; i < 3; i += 1) {
+    const x = 151 + i * 38;
+    const y = 120 + Math.sin(performance.now() / 220 + i) * 2;
+    ctx.fillStyle = "#101322";
+    ctx.fillRect(x + 2, y + 2, 14, 22);
+    ctx.fillStyle = colors[i];
+    ctx.fillRect(x, y + 8, 14, 14);
+    ctx.fillStyle = "#f8f3d2";
+    ctx.fillRect(x + 3, y, 8, 8);
+    ctx.fillStyle = "#101322";
+    ctx.fillRect(x + 8, y + 3, 2, 2);
+  }
+
+  ctx.fillStyle = "#f2b84b";
+  ctx.font = "8px monospace";
+  ctx.fillText("CREDITS", VIEW_W / 2, 87);
+  ctx.fillStyle = "#d8ddff";
+  ctx.fillText("design  code  audio  pixel craft", VIEW_W / 2, 100);
+  ctx.fillText("original arcade relay team", VIEW_W / 2, 112);
+  ctx.fillText("ENTER/R: restart     ESC: title", VIEW_W / 2, 156);
+  ctx.textAlign = "left";
+}
+
 function draw() {
   if (!level) {
     level = levels[0];
     cloneLevelObjects(level);
+  }
+  if (state.mode === "ending") {
+    drawEnding();
+    return;
   }
   drawBackground();
   ctx.save();
@@ -862,7 +952,7 @@ function loop(time) {
 }
 
 function restartStage() {
-  if (state.mode === "title" || state.mode === "won") {
+  if (state.mode === "title" || state.mode === "ending") {
     startGame();
     return;
   }
@@ -891,6 +981,7 @@ window.addEventListener("keydown", (event) => {
     startMusicFromGesture();
     restartStage();
   }
+  if (event.code === "Escape") showTitle();
 });
 
 window.addEventListener("keyup", (event) => {

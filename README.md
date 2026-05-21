@@ -7,10 +7,10 @@ An original browser-based retro platformer prototype. It uses generated canvas p
 Open `index.html` directly in a browser, or serve the folder with any static server:
 
 ```sh
-python3 -m http.server 8000
+npm start
 ```
 
-Then visit `http://localhost:8000`.
+Then visit `http://127.0.0.1:8765`.
 
 ## Controls
 
@@ -19,6 +19,7 @@ Then visit `http://localhost:8000`.
 - Mute/unmute original music: `M` or the Audio button
 - Restart current stage: `R`
 - Start from title or win screen: `Enter`
+- Return to the title menu: `Esc`
 
 ## Audio
 
@@ -30,13 +31,17 @@ The soundtrack is an original chiptune-style loop generated in `src/game.js` wit
 - `2-2 Moonlit Mill`: tighter jumps with staggered platforms
 - `3-3 Prism Spire`: final approach ending in the Glassheart Warden boss fight
 
-Reach the relay flag at the end of each level. On level 3, defeat the Glassheart Warden before touching the final flag.
+Reach the relay flag at the end of each level. On level 3, defeat the Glassheart Warden to trigger the ending screen immediately.
+
+## Ending Flow
+
+Defeating the level 3 boss opens a dedicated pixel-art ending screen with completion text and credits. From that ending, press `Enter` or `R` to start a fresh run, or press `Esc` to return to the title menu.
 
 ## Original Arcade Sound Effects
 
 The repository also includes an original Web Audio sound-effects module for
 retro platformer gameplay. The effects are synthesized at runtime and do not use
-Nintendo, Mario, or ripped sample assets.
+franchise samples or ripped audio assets.
 
 ### Included Effects
 

@@ -1,6 +1,6 @@
 # Cinder Run: Sky Relay
 
-An original browser-based retro platformer prototype. It uses generated canvas pixel art and original names, code, maps, enemies, and boss design.
+An original browser-based retro platformer prototype about relighting a fading sky relay. It uses generated canvas pixel art and original names, code, maps, enemies, and boss design.
 
 ## Run Locally
 
@@ -14,29 +14,29 @@ Then visit `http://127.0.0.1:8765`.
 
 ## Controls
 
-- Move: `A` / `D` or left / right arrows
-- Jump: `W`, up arrow, or space
-- Run into a jump to gain a little extra height from your horizontal speed
-- Mute/unmute original music: `M` or the Audio button
-- Restart current stage: `R`
-- Start from title or win screen: `Enter`
+- Run: `A` / `D` or left / right arrows
+- Leap: `W`, up arrow, or space
+- Run into a leap to gain a little extra height from your horizontal speed
+- Silence/restore the original tune: `M` or the Tune button
+- Retry current stage: `R`
+- Begin from title or ending screen: `Enter`
 - Return to the title menu: `Esc`
 
 ## Audio
 
-The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Start, `Enter`, `R`, or the Audio button.
+The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Begin Relay, `Enter`, `R`, or the Tune button.
 
 ## Game Structure
 
-- `1-1 Ember Fields`: introductory gaps, patrol enemies, and crystal pickups
-- `2-2 Moonlit Mill`: tighter jumps with staggered platforms
+- `1-1 Ember Gate`: introductory gaps, patrol enemies, and prism spark pickups
+- `2-2 Moon Mill`: tighter leaps with staggered platforms
 - `3-3 Prism Spire`: final approach ending in the Glassheart Warden boss fight
 
-Reach the relay flag at the end of each level. On level 3, defeat the Glassheart Warden to trigger the ending screen immediately.
+Reach the relay flag at the end of each stage. On stage 3, defeat the Glassheart Warden to trigger the ending screen immediately.
 
 ## Ending Flow
 
-Defeating the level 3 boss opens a dedicated pixel-art ending screen with completion text and credits. From that ending, press `Enter` or `R` to start a fresh run, or press `Esc` to return to the title menu.
+Defeating the stage 3 boss opens a dedicated pixel-art ending screen with completion text and credits. From that ending, press `Enter` or `R` to start a new run, or press `Esc` to return to the title menu.
 
 ## Original Arcade Sound Effects
 

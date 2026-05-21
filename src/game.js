@@ -31,8 +31,8 @@ const state = {
   score: 0,
   cameraX: 0,
   messageTitle: "Cinder Run: Sky Relay",
-  messageBody: "An original pocket-sized platformer. Run, jump, collect prism crystals, and clear three stages.",
-  messageButton: "Start Run",
+  messageBody: "Dash the ember road, gather prism sparks, and relight three towers before the sky grid fades.",
+  messageButton: "Begin Relay",
   lastTime: 0
 };
 
@@ -95,7 +95,7 @@ const music = (() => {
   let nextStepTime = 0;
 
   function updateButton() {
-    ui.musicButton.textContent = muted ? "Unmute" : "Mute";
+    ui.musicButton.textContent = muted ? "Restore" : "Silence";
     ui.musicButton.setAttribute("aria-pressed", String(muted));
   }
 
@@ -117,7 +117,7 @@ const music = (() => {
 
   function ensureContext() {
     if (!AudioContextCtor) {
-      ui.musicButton.textContent = "No Audio";
+      ui.musicButton.textContent = "No Tune";
       ui.musicButton.disabled = true;
       return null;
     }
@@ -257,7 +257,7 @@ const player = {
 
 const levels = [
   {
-    name: "1-1 Ember Fields",
+    name: "1-1 Ember Gate",
     width: 1500,
     sky: ["#7bd8ff", "#f6d26b"],
     ground: ["#69452d", "#a76539", "#f0bd50"],
@@ -294,7 +294,7 @@ const levels = [
     ]
   },
   {
-    name: "2-2 Moonlit Mill",
+    name: "2-2 Moon Mill",
     width: 1700,
     sky: ["#23366f", "#7b5bbd"],
     ground: ["#343044", "#5b5570", "#9bc9ff"],
@@ -448,8 +448,8 @@ function showTitle() {
   updateHud();
   showMessage(
     "Cinder Run: Sky Relay",
-    "An original pocket-sized platformer. Run, jump, collect prism crystals, and clear three stages.",
-    "Start Run"
+    "Dash the ember road, gather prism sparks, and relight three towers before the sky grid fades.",
+    "Begin Relay"
   );
 }
 
@@ -458,14 +458,14 @@ function completeRun() {
   state.cameraX = 0;
   ui.bossHud.hidden = true;
   showMessage(
-    "Relay Restored",
-    `You cleared all three stages with ${state.score} prism points. Credits: design, code, audio, and pixel art by the original relay team.`,
-    "Run Again"
+    "Sky Relay Lit",
+    `All three towers burn bright. Final score: ${state.score} prism sparks. Credits: design, code, audio, and pixel craft by the relay crew.`,
+    "New Run"
   );
 }
 
 function updateHud() {
-  ui.levelName.textContent = level ? level.name : "1-1 Ember Fields";
+  ui.levelName.textContent = level ? level.name : "1-1 Ember Gate";
   ui.score.textContent = String(state.score);
   ui.hearts.textContent = "♥".repeat(Math.max(0, player.hp)) || "0";
   if (boss && boss.alive) {
@@ -514,7 +514,7 @@ function damagePlayer(amount = 1) {
   updateHud();
   if (player.hp <= 0) {
     state.mode = "lost";
-    showMessage("Signal Lost", "The relay went dark. Restart the stage and try a cleaner route.", "Retry Stage");
+    showMessage("Spark Out", "The route went dark. Retry the stage and keep the relay burning.", "Retry Stage");
   }
 }
 
@@ -690,7 +690,7 @@ function updateGoal() {
   const goal = { x: level.goal.x, y: level.goal.y, w: 18, h: 86 };
   if (!rectsTouch(player, goal)) return;
   if (boss && boss.alive) {
-    showToast("Break the warden's glass core first.");
+    showToast("Shatter the warden core first.");
     return;
   }
   if (state.levelIndex < levels.length - 1) {
@@ -903,10 +903,10 @@ function drawEnding() {
   ctx.textAlign = "center";
   ctx.fillStyle = "#7cff9b";
   ctx.font = "22px monospace";
-  ctx.fillText("RELAY RESTORED", VIEW_W / 2, 45);
+  ctx.fillText("SKY RELAY LIT", VIEW_W / 2, 45);
   ctx.fillStyle = "#f8f3d2";
   ctx.font = "9px monospace";
-  ctx.fillText("three towers lit the sky grid again", VIEW_W / 2, 64);
+  ctx.fillText("three towers burn over the cinder road", VIEW_W / 2, 64);
 
   const colors = ["#ffcf5a", "#4fe0a7", "#ff9ccc"];
   for (let i = 0; i < 3; i += 1) {
@@ -927,8 +927,8 @@ function drawEnding() {
   ctx.fillText("CREDITS", VIEW_W / 2, 87);
   ctx.fillStyle = "#d8ddff";
   ctx.fillText("design  code  audio  pixel craft", VIEW_W / 2, 100);
-  ctx.fillText("original arcade relay team", VIEW_W / 2, 112);
-  ctx.fillText("ENTER/R: restart     ESC: title", VIEW_W / 2, 156);
+  ctx.fillText("the original sky relay crew", VIEW_W / 2, 112);
+  ctx.fillText("ENTER/R: new run     ESC: title", VIEW_W / 2, 156);
   ctx.textAlign = "left";
 }
 

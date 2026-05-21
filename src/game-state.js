@@ -11,7 +11,7 @@ export function createInitialState(now = 0) {
     creditsSeen: false,
     levelsCleared: 0,
     boss: createBossState(),
-    message: "Press Enter to launch the relay"
+    message: "Press Enter to begin the relay"
   };
 }
 
@@ -33,7 +33,7 @@ export function startGame(state = createInitialState(), now = 0) {
     creditsSeen: false,
     levelsCleared: 0,
     boss: createBossState(),
-    message: "Relay tower one is active"
+    message: "Ember Gate tower lit"
   };
 }
 
@@ -42,8 +42,8 @@ export function returnToMenu(state = createInitialState()) {
     ...createInitialState(),
     creditsSeen: state.screen === "ending" || state.creditsSeen,
     message: state.screen === "ending"
-      ? "Relay complete. Press Enter for another run"
-      : "Press Enter to launch the relay"
+      ? "Sky Relay lit. Press Enter for a new run"
+      : "Press Enter to begin the relay"
   };
 }
 
@@ -67,8 +67,8 @@ export function clearCurrentLevel(state) {
     levelsCleared: Math.max(state.level, state.levelsCleared),
     boss: nextLevel === BOSS_LEVEL ? createBossState() : state.boss,
     message: nextLevel === BOSS_LEVEL
-      ? "Final tower online. Break the prism core"
-      : `Relay tower ${nextLevel} is active`
+      ? "Final tower waits. Shatter the prism core"
+      : `Tower ${nextLevel} is lit`
   };
 }
 
@@ -87,7 +87,7 @@ export function damageBoss(state, amount = 1, now = 0) {
         ...state.boss,
         health: nextHealth
       },
-      message: "Prism core unstable"
+      message: "Prism core cracking"
     };
   }
 
@@ -102,7 +102,7 @@ export function damageBoss(state, amount = 1, now = 0) {
       health: 0,
       defeated: true
     },
-    message: "Relay complete"
+    message: "Sky Relay lit"
   };
 }
 

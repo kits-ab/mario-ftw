@@ -8,27 +8,27 @@
   </head>
   <body>
     <main class="shell">
-      <section class="game-wrap" aria-label="Cinder Run game">
+      <section class="game-wrap" aria-label="Cinder Run: Sky Relay game">
         <div class="hud" aria-live="polite">
           <div>
-            <span class="hud-label">Level</span>
-            <strong id="levelName">1-1 Ember Fields</strong>
+            <span class="hud-label">Stage</span>
+            <strong id="levelName">1-1 Ember Gate</strong>
           </div>
           <div>
-            <span class="hud-label">Crystals</span>
+            <span class="hud-label">Prisms</span>
             <strong id="score">0</strong>
           </div>
           <div>
-            <span class="hud-label">Hearts</span>
+            <span class="hud-label">Spark</span>
             <strong id="hearts">3</strong>
           </div>
           <div id="bossHud" class="boss-hud" hidden>
-            <span class="hud-label">Boss</span>
+            <span class="hud-label">Warden</span>
             <strong id="bossHearts">---</strong>
           </div>
           <div class="audio-hud">
-            <span class="hud-label">Audio</span>
-            <button id="musicButton" class="hud-button" type="button" aria-pressed="false">Mute</button>
+            <span class="hud-label">Tune</span>
+            <button id="musicButton" class="hud-button" type="button" aria-pressed="false">Silence</button>
           </div>
         </div>
 
@@ -36,16 +36,17 @@
 
         <div id="message" class="message">
           <h1>Cinder Run: Sky Relay</h1>
-          <p>An original pocket-sized platformer. Run, jump, collect prism crystals, and clear three stages.</p>
-          <button id="startButton" type="button">Start Run</button>
+          <p>Dash the ember road, gather prism sparks, and relight three towers before the sky grid fades.</p>
+          <button id="startButton" type="button">Begin Relay</button>
         </div>
 
         <div class="controls" aria-label="Keyboard controls">
-          <span>Move: A/D or Arrows</span>
-          <span>Jump: W, Up, or Space</span>
-          <span>Music: M</span>
-          <span>Restart: R</span>
-          <span>Menu: Esc</span>
+          <span>Run: A/D or Arrows</span>
+          <span>Leap: W, Up, or Space</span>
+          <span>Speed boosts leaps</span>
+          <span>Tune: M</span>
+          <span>Retry: R</span>
+          <span>Title: Esc</span>
         </div>
       </section>
     </main>

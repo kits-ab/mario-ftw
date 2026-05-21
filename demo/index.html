@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Retro SFX Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: #111318;
+        color: #f2f5f8;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+      }
+
+      main {
+        width: min(720px, calc(100vw - 32px));
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .controls,
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        min-height: 44px;
+        border: 1px solid #3c4452;
+        border-radius: 6px;
+        background: #1e2633;
+        color: #f2f5f8;
+        cursor: pointer;
+        padding: 0 14px;
+      }
+
+      button:hover {
+        background: #293448;
+      }
+
+      label {
+        align-items: center;
+        display: inline-flex;
+        gap: 8px;
+        min-height: 44px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Retro SFX Demo</h1>
+      <div class="controls">
+        <button id="unlock" type="button">Enable sound</button>
+        <button id="mute" type="button">Mute</button>
+        <label>
+          Volume
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7">
+        </label>
+      </div>
+      <div class="grid" id="effects"></div>
+    </main>
+    <script type="module">
+      import { RetroSfx } from "../src/retro-sfx.js";
+
+      const sfx = new RetroSfx();
+      const effects = document.querySelector("#effects");
+      const mute = document.querySelector("#mute");
+      const volume = document.querySelector("#volume");
+
+      document.querySelector("#unlock").addEventListener("click", async () => {
+        await sfx.unlock();
+        sfx.play("menuConfirm");
+      });
+
+      mute.addEventListener("click", () => {
+        const muted = sfx.toggleMute();
+        mute.textContent = muted ? "Unmute" : "Mute";
+      });
+
+      volume.addEventListener("input", () => {
+        sfx.setVolume(volume.value);
+      });
+
+      for (const effect of RetroSfx.effects) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = effect;
+        button.addEventListener("click", () => sfx.play(effect));
+        effects.append(button);
+      }
+    </script>
+  </body>
+</html>

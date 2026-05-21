@@ -1,6 +1,6 @@
 # Cinder Run: Sky Relay
 
-An original browser-based retro platformer prototype about relighting a fading sky relay. It uses generated canvas pixel art and original names, code, maps, enemies, and boss design.
+An original browser-based retro platformer prototype about relighting a fading sky relay. It uses generated canvas pixel art and original names, code, maps, enemies, soundtrack, and boss design.
 
 ## Run Locally
 
@@ -24,7 +24,11 @@ Then visit `http://127.0.0.1:8765`.
 
 ## Audio
 
-The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Begin Relay, `Enter`, `R`, or the Tune button.
+The soundtrack is an original chiptune-style loop generated in `src/game.js` with the Web Audio API. It uses synthesized square-wave leads, pulse bass, arpeggios, triangle harmony stabs, and noise percussion; there are no copied melodies, samples, or external audio assets. Browser audio begins only after a player interaction such as Begin Relay, `Enter`, `R`, or the Tune button.
+
+## Visual Style
+
+All stage art is drawn at runtime with original canvas pixel shapes. The brighter tile palettes, chunky character silhouettes, crystals, relay flags, enemies, boss, background hills, cloud clusters, and skyline details are purpose-built for this project and do not use franchise sprites, logos, copied block designs, or copied maps.
 
 ## Game Structure
 

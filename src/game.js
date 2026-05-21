@@ -38,6 +38,8 @@ const state = {
 
 const music = (() => {
   const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+  const TEMPO = 152;
+  const STEP = 60 / TEMPO / 4;
   const noteOffsets = {
     C: 0,
     "C#": 1,
@@ -54,33 +56,45 @@ const music = (() => {
   };
   const sections = [
     {
-      bass: ["C2", "C2", "G1", "A#1", "F2", "F2", "G2", "G1"],
-      arp: ["C4", "E4", "G4", "A#4", "F4", "A4", "C5", "D5"],
+      bass: ["C2", "C2", "G1", "C2", "A1", "A1", "F1", "G1"],
+      harmony: ["E4", "G4", "C5", "G4", "F4", "A4", "D5", "B4"],
+      arp: [
+        "C4", "E4", "G4", "C5", "A3", "E4", "A4", "C5",
+        "F4", "A4", "C5", "F5", "G4", "B4", "D5", "G5"
+      ],
       lead: [
-        "E5", null, "G5", null, "A#5", "G5", null, "E5",
-        "D5", null, "C5", null, "D5", "E5", null, null,
-        "G5", null, "A#5", null, "C6", "A#5", "G5", null,
-        "F5", null, "D5", null, "E5", null, null, null
+        "E5", null, "G5", "A5", "C6", null, "G5", "E5",
+        "D5", "E5", "G5", null, "A5", "G5", "E5", null,
+        "G5", null, "C6", "D6", "E6", null, "D6", "C6",
+        "A5", "G5", "E5", null, "G5", "A5", "C6", null
       ]
     },
     {
-      bass: ["D2", "D2", "A1", "C2", "G1", "G1", "A1", "C2"],
-      arp: ["D4", "F4", "A4", "C5", "G4", "A#4", "D5", "F5"],
+      bass: ["D2", "D2", "A1", "D2", "B1", "B1", "G1", "A1"],
+      harmony: ["F4", "A4", "D5", "A4", "G4", "B4", "E5", "C#5"],
+      arp: [
+        "D4", "F4", "A4", "D5", "B3", "F4", "B4", "D5",
+        "G4", "B4", "D5", "G5", "A4", "C#5", "E5", "A5"
+      ],
       lead: [
-        "F5", null, "A5", null, "C6", "A5", null, "F5",
-        "E5", null, "D5", "E5", "F5", null, null, null,
-        "A5", null, "C6", null, "D6", "C6", "A5", null,
-        "G5", null, "E5", null, "F5", null, null, null
+        "F5", null, "A5", "B5", "D6", null, "A5", "F5",
+        "E5", "F5", "A5", null, "B5", "A5", "F5", null,
+        "A5", null, "D6", "E6", "F6", null, "E6", "D6",
+        "B5", "A5", "F5", null, "A5", "B5", "D6", null
       ]
     },
     {
-      bass: ["F2", "F2", "C2", "D#2", "A#1", "A#1", "C2", "D#2"],
-      arp: ["F4", "G#4", "C5", "D#5", "A#4", "D5", "F5", "G5"],
+      bass: ["F2", "F2", "C2", "F2", "D2", "D2", "A#1", "C2"],
+      harmony: ["A4", "C5", "F5", "C5", "A#4", "D5", "G5", "E5"],
+      arp: [
+        "F4", "A4", "C5", "F5", "D4", "A4", "D5", "F5",
+        "A#4", "D5", "F5", "A#5", "C5", "E5", "G5", "C6"
+      ],
       lead: [
-        "G#5", null, "C6", null, "D#6", "C6", "G#5", null,
-        "G5", null, "F5", "G5", "G#5", null, null, null,
-        "C6", null, "D#6", null, "F6", "D#6", "C6", null,
-        "A#5", null, "G5", null, "G#5", null, null, null
+        "A5", null, "C6", "D6", "F6", null, "C6", "A5",
+        "G5", "A5", "C6", null, "D6", "C6", "A5", null,
+        "C6", null, "F6", "G6", "A6", null, "G6", "F6",
+        "D6", "C6", "A5", null, "C6", "D6", "F6", null
       ]
     }
   ];
@@ -166,27 +180,35 @@ const music = (() => {
 
   function scheduleStep(currentStep, time) {
     const section = sections[sectionIndex % sections.length];
-    const sixteenth = 60 / 138 / 4;
     const leadNote = section.lead[currentStep % section.lead.length];
 
     if (currentStep % 4 === 0) {
-      playTone(section.bass[Math.floor(currentStep / 4) % section.bass.length], time, sixteenth * 3.2, 0.18, "square", -9);
+      const bassNote = section.bass[Math.floor(currentStep / 4) % section.bass.length];
+      playTone(bassNote, time, STEP * 3.4, 0.18, "square", -7);
     }
     if (currentStep % 2 === 1) {
-      playTone(section.arp[Math.floor(currentStep / 2) % section.arp.length], time, sixteenth * 0.65, 0.045, "square", 4);
+      const arpNote = section.arp[Math.floor(currentStep / 2) % section.arp.length];
+      playTone(arpNote, time, STEP * 0.72, 0.052, "square", 5);
+    }
+    if (currentStep % 8 === 2 || currentStep % 8 === 6) {
+      const harmonyNote = section.harmony[Math.floor(currentStep / 4) % section.harmony.length];
+      playTone(harmonyNote, time, STEP * 1.15, 0.05, "triangle", 0);
     }
     if (leadNote) {
-      playTone(leadNote, time, sixteenth * (currentStep % 8 === 4 ? 2.4 : 1.35), 0.105, "square");
-      playTone(leadNote, time + 0.012, sixteenth, 0.035, "square", -12);
+      playTone(leadNote, time, STEP * (currentStep % 8 === 4 ? 2.35 : 1.2), 0.115, "square");
+      playTone(leadNote, time + 0.011, STEP * 0.85, 0.032, "square", -12);
+      if (currentStep % 8 === 3 || currentStep % 8 === 7) {
+        playTone(leadNote, time + STEP * 0.5, STEP * 0.55, 0.045, "square", 12);
+      }
     }
     if (currentStep % 8 === 0) {
-      playTone("C2", time, sixteenth * 1.7, 0.2, "triangle", -18);
+      playTone(section.bass[0], time, STEP * 1.65, 0.21, "triangle", -18);
     }
     if (currentStep % 8 === 4) {
-      playNoise(time, sixteenth * 1.1, 0.12, 1300);
+      playNoise(time, STEP * 1.1, 0.12, 1350);
     }
     if (currentStep % 2 === 0) {
-      playNoise(time, sixteenth * 0.28, 0.035, 5200);
+      playNoise(time, STEP * 0.26, 0.038, 5400);
     }
   }
 
@@ -194,7 +216,7 @@ const music = (() => {
     if (!audioCtx || !active) return;
     while (nextStepTime < audioCtx.currentTime + 0.12) {
       scheduleStep(step, nextStepTime);
-      nextStepTime += 60 / 138 / 4;
+      nextStepTime += STEP;
       step = (step + 1) % 32;
     }
   }
@@ -259,9 +281,9 @@ const levels = [
   {
     name: "1-1 Ember Gate",
     width: 1500,
-    sky: ["#7bd8ff", "#f6d26b"],
-    ground: ["#69452d", "#a76539", "#f0bd50"],
-    accent: "#71e17c",
+    sky: ["#69ddff", "#ffe177"],
+    ground: ["#5b351f", "#e27b38", "#ffd75a"],
+    accent: "#4ee86f",
     spawn: { x: 28, y: 126 },
     goal: { x: 1426, y: 98 },
     platforms: [
@@ -296,9 +318,9 @@ const levels = [
   {
     name: "2-2 Moon Mill",
     width: 1700,
-    sky: ["#23366f", "#7b5bbd"],
-    ground: ["#343044", "#5b5570", "#9bc9ff"],
-    accent: "#ffd56c",
+    sky: ["#3c58d6", "#c27cff"],
+    ground: ["#2f315c", "#6d65cc", "#7ce6ff"],
+    accent: "#ffe66f",
     spawn: { x: 28, y: 112 },
     goal: { x: 1622, y: 78 },
     platforms: [
@@ -336,9 +358,9 @@ const levels = [
   {
     name: "3-3 Prism Spire",
     width: 1900,
-    sky: ["#483071", "#f07593"],
-    ground: ["#3e3148", "#76506b", "#69f0ca"],
-    accent: "#77ffdb",
+    sky: ["#7744c8", "#ff7aa8"],
+    ground: ["#3b285a", "#c15a95", "#74ffd8"],
+    accent: "#7cffdb",
     spawn: { x: 28, y: 132 },
     goal: { x: 1824, y: 86 },
     platforms: [
@@ -737,16 +759,19 @@ function drawBackground() {
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   const parallax = state.cameraX * 0.18;
-  ctx.fillStyle = "rgba(255,255,255,0.48)";
-  for (let i = 0; i < 9; i += 1) {
-    const x = (i * 96 - parallax) % (VIEW_W + 96) - 44;
-    const y = 28 + (i % 3) * 20;
-    ctx.fillRect(x, y, 24, 6);
-    ctx.fillRect(x + 8, y - 5, 28, 8);
-    ctx.fillRect(x + 30, y + 2, 18, 5);
+  ctx.fillStyle = "rgba(255,255,255,0.66)";
+  for (let i = 0; i < 10; i += 1) {
+    const x = Math.floor((i * 88 - parallax) % (VIEW_W + 112) - 50);
+    const y = 24 + (i % 3) * 19;
+    ctx.fillRect(x, y, 24, 7);
+    ctx.fillRect(x + 8, y - 6, 30, 9);
+    ctx.fillRect(x + 30, y + 2, 20, 6);
+    ctx.fillStyle = "rgba(255,255,255,0.34)";
+    ctx.fillRect(x + 12, y + 8, 18, 2);
+    ctx.fillStyle = "rgba(255,255,255,0.66)";
   }
 
-  ctx.fillStyle = "rgba(38, 43, 76, 0.42)";
+  ctx.fillStyle = "rgba(47, 63, 128, 0.34)";
   const hillOffset = state.cameraX * 0.32;
   for (let i = 0; i < 8; i += 1) {
     const x = i * 128 - (hillOffset % 128) - 40;
@@ -757,18 +782,51 @@ function drawBackground() {
     ctx.closePath();
     ctx.fill();
   }
+
+  const midOffset = state.cameraX * 0.48;
+  for (let i = 0; i < 13; i += 1) {
+    const x = Math.floor(i * 58 - (midOffset % 58) - 22);
+    const y = 153 + (i % 2) * 7;
+    ctx.fillStyle = i % 2 === 0
+      ? "rgba(124, 255, 155, 0.42)"
+      : "rgba(255, 214, 90, 0.38)";
+    ctx.fillRect(x, y + 14, 42, 17);
+    ctx.fillRect(x + 7, y + 7, 28, 9);
+    ctx.fillRect(x + 15, y, 12, 9);
+    ctx.fillStyle = "rgba(16, 19, 34, 0.18)";
+    ctx.fillRect(x + 8, y + 20, 5, 8);
+    ctx.fillRect(x + 27, y + 19, 5, 9);
+  }
+
+  ctx.fillStyle = "rgba(248, 243, 210, 0.42)";
+  for (let i = 0; i < 18; i += 1) {
+    const x = Math.floor((i * 47 - state.cameraX * 0.12) % (VIEW_W + 60) - 26);
+    const y = 20 + ((i * 29) % 92);
+    ctx.fillRect(x, y, 2, 2);
+    if (i % 3 === 0) {
+      ctx.fillRect(x - 2, y + 2, 2, 2);
+      ctx.fillRect(x + 2, y + 2, 2, 2);
+    }
+  }
 }
 
 function drawPlatform(block) {
   const x = Math.floor(block.x - state.cameraX);
   const y = Math.floor(block.y);
+  ctx.fillStyle = "#101322";
+  ctx.fillRect(x - 2, y - 2, block.w + 4, block.h + 4);
   ctx.fillStyle = level.ground[0];
   ctx.fillRect(x, y, block.w, block.h);
   ctx.fillStyle = level.ground[1];
-  ctx.fillRect(x, y, block.w, 6);
+  ctx.fillRect(x, y, block.w, 8);
   ctx.fillStyle = level.ground[2];
   for (let tx = 0; tx < block.w; tx += 16) {
-    ctx.fillRect(x + tx + 2, y + 1, 9, 3);
+    ctx.fillRect(x + tx + 2, y + 1, 9, 4);
+    ctx.fillRect(x + tx + 11, y + 5, 4, 3);
+  }
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  for (let tx = 0; tx < block.w; tx += 32) {
+    ctx.fillRect(x + tx + 3, y + 10, 8, 3);
   }
   ctx.fillStyle = "rgba(0,0,0,0.25)";
   for (let tx = 0; tx < block.w; tx += 16) {
@@ -781,7 +839,7 @@ function drawHazard(hazard) {
   const y = Math.floor(hazard.y);
   ctx.fillStyle = "#1d1220";
   ctx.fillRect(x, y + 10, hazard.w, 8);
-  ctx.fillStyle = "#ff6262";
+  ctx.fillStyle = "#ff315f";
   for (let px = 0; px < hazard.w; px += 8) {
     ctx.beginPath();
     ctx.moveTo(x + px, y + 12);
@@ -789,6 +847,9 @@ function drawHazard(hazard) {
     ctx.lineTo(x + px + 8, y + 12);
     ctx.closePath();
     ctx.fill();
+    ctx.fillStyle = "#ffd75a";
+    ctx.fillRect(x + px + 3, y + 5, 2, 4);
+    ctx.fillStyle = "#ff315f";
   }
 }
 
@@ -797,11 +858,14 @@ function drawPickup(pickup) {
   const x = Math.floor(pickup.x - state.cameraX);
   const y = Math.floor(pickup.y + Math.sin(performance.now() / 180 + pickup.bob) * 2);
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x + 1, y + 1, 6, 6);
-  ctx.fillStyle = "#62d6ff";
-  ctx.fillRect(x + 2, y, 4, 8);
+  ctx.fillRect(x + 1, y + 1, 8, 8);
+  ctx.fillStyle = "#2de2ff";
+  ctx.fillRect(x + 3, y, 4, 10);
+  ctx.fillRect(x + 1, y + 3, 8, 4);
+  ctx.fillStyle = "#b9fbff";
+  ctx.fillRect(x + 4, y + 2, 2, 2);
   ctx.fillStyle = "#f8f3d2";
-  ctx.fillRect(x + 3, y + 2, 2, 2);
+  ctx.fillRect(x + 6, y + 1, 2, 2);
 }
 
 function drawEnemy(enemy) {
@@ -809,15 +873,20 @@ function drawEnemy(enemy) {
   const x = Math.floor(enemy.x - state.cameraX);
   const y = Math.floor(enemy.y);
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x + 1, y + 3, enemy.w, enemy.h);
-  ctx.fillStyle = enemy.type === "flutter" ? "#ff9ccc" : "#c6ff6b";
-  ctx.fillRect(x, y, enemy.w, enemy.h);
+  ctx.fillRect(x + 1, y + 3, enemy.w + 2, enemy.h);
+  ctx.fillStyle = enemy.type === "flutter" ? "#ff7fc9" : "#b9ff39";
+  ctx.fillRect(x, y + 2, enemy.w + 2, enemy.h - 2);
+  ctx.fillRect(x + 3, y, enemy.w - 4, 4);
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x + (enemy.vx > 0 ? 9 : 3), y + 3, 2, 2);
+  ctx.fillRect(x + (enemy.vx > 0 ? 10 : 3), y + 4, 2, 2);
+  ctx.fillRect(x + (enemy.vx > 0 ? 4 : 10), y + 9, 4, 2);
   if (enemy.type === "flutter") {
     ctx.fillStyle = "#f8f3d2";
-    ctx.fillRect(x - 4, y + 2, 4, 5);
-    ctx.fillRect(x + enemy.w, y + 2, 4, 5);
+    ctx.fillRect(x - 5, y + 2, 5, 6);
+    ctx.fillRect(x + enemy.w + 2, y + 2, 5, 6);
+    ctx.fillStyle = "#ffd75a";
+    ctx.fillRect(x - 3, y + 4, 3, 2);
+    ctx.fillRect(x + enemy.w + 2, y + 4, 3, 2);
   }
 }
 
@@ -826,16 +895,23 @@ function drawBoss() {
   const x = Math.floor(boss.x - state.cameraX);
   const y = Math.floor(boss.y);
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x + 3, y + 3, boss.w, boss.h);
-  ctx.fillStyle = boss.hurt > 0 ? "#f8f3d2" : "#8f6cff";
-  ctx.fillRect(x, y + 8, boss.w, boss.h - 8);
-  ctx.fillStyle = "#ff6262";
-  ctx.fillRect(x + 5, y, 20, 12);
+  ctx.fillRect(x + 3, y + 3, boss.w + 2, boss.h + 1);
+  ctx.fillStyle = boss.hurt > 0 ? "#f8f3d2" : "#9c79ff";
+  ctx.fillRect(x, y + 9, boss.w + 2, boss.h - 9);
+  ctx.fillStyle = "#5cf1ff";
+  ctx.fillRect(x + 5, y + 14, 21, 5);
+  ctx.fillStyle = "#ff4f8b";
+  ctx.fillRect(x + 4, y, 22, 13);
+  ctx.fillStyle = "#ffd75a";
+  ctx.fillRect(x + 8, y + 2, 4, 4);
+  ctx.fillRect(x + 18, y + 2, 4, 4);
   ctx.fillStyle = "#101322";
   ctx.fillRect(x + 8, y + 18, 4, 4);
   ctx.fillRect(x + 19, y + 18, 4, 4);
-  ctx.fillStyle = "#69f0ca";
-  ctx.fillRect(x + 9, y + 29, 12, 5);
+  ctx.fillStyle = "#74ffd8";
+  ctx.fillRect(x + 9, y + 29, 14, 5);
+  ctx.fillStyle = "#f8f3d2";
+  ctx.fillRect(x + 12, y + 34, 8, 3);
 }
 
 function drawPlayer() {
@@ -843,27 +919,36 @@ function drawPlayer() {
   const y = Math.floor(player.y);
   if (player.inv > 0 && Math.floor(player.inv * 14) % 2 === 0) return;
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x + 2, y + 2, player.w, player.h);
-  ctx.fillStyle = "#ffcf5a";
-  ctx.fillRect(x + 2, y, 8, 6);
-  ctx.fillStyle = "#4fe0a7";
-  ctx.fillRect(x + 1, y + 6, 10, 8);
+  ctx.fillRect(x + 2, y + 2, player.w + 1, player.h);
+  ctx.fillStyle = "#ffd447";
+  ctx.fillRect(x + 2, y, 9, 6);
+  ctx.fillRect(x + 1, y + 4, 11, 3);
+  ctx.fillStyle = "#25d68b";
+  ctx.fillRect(x + 1, y + 7, 11, 8);
+  ctx.fillStyle = "#ff5d7d";
+  ctx.fillRect(x + (player.dir > 0 ? 0 : 9), y + 8, 3, 5);
   ctx.fillStyle = "#f8f3d2";
   ctx.fillRect(x + (player.dir > 0 ? 8 : 2), y + 2, 2, 2);
-  ctx.fillStyle = "#3340a0";
+  ctx.fillStyle = "#244ecb";
   ctx.fillRect(x + 1, y + 14, 4, 3);
   ctx.fillRect(x + 8, y + 14, 4, 3);
+  ctx.fillStyle = "#f8f3d2";
+  ctx.fillRect(x + (player.dir > 0 ? 11 : -1), y + 9, 2, 2);
 }
 
 function drawGoal() {
   const x = Math.floor(level.goal.x - state.cameraX);
   const y = level.goal.y;
   ctx.fillStyle = "#101322";
-  ctx.fillRect(x, y, 4, 88);
+  ctx.fillRect(x, y, 5, 88);
   ctx.fillStyle = level.accent;
-  ctx.fillRect(x + 4, y + 6, 16, 18);
+  ctx.fillRect(x + 5, y + 6, 17, 18);
+  ctx.fillStyle = "#ff4f8b";
+  ctx.fillRect(x + 8, y + 9, 11, 4);
   ctx.fillStyle = "#f8f3d2";
-  ctx.fillRect(x + 8, y + 10, 6, 6);
+  ctx.fillRect(x + 10, y + 14, 6, 6);
+  ctx.fillStyle = "#ffd75a";
+  ctx.fillRect(x - 3, y + 84, 12, 4);
 }
 
 function drawSparks() {
